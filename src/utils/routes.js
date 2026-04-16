@@ -1,3 +1,5 @@
+import { appendMiniAppIdentity } from './miniAppUser';
+
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
 export function getInternalPath() {
@@ -10,5 +12,5 @@ export function getInternalPath() {
 
 export function toExternalPath(path) {
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${BASE}${normalized}`;
+  return `${BASE}${appendMiniAppIdentity(normalized)}`;
 }

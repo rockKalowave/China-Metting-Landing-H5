@@ -9,6 +9,7 @@ const identityOptions = ['Designer', 'Brand', 'Cross-border Seller', 'Service Pr
 const signupTickets = [
   {
     id: 'early-bird',
+    productCode: 'TICKET_EARLY_BIRD',
     title: 'Early Bird 2-Day Pass',
     originalPrice: 599,
     price: 0,
@@ -23,6 +24,7 @@ const signupTickets = [
   },
   {
     id: 'vip',
+    productCode: 'TICKET_VIP',
     title: 'VIP Pass',
     originalPrice: 1999,
     price: 1299,
@@ -38,6 +40,7 @@ const signupTickets = [
   },
   {
     id: 'single-day',
+    productCode: 'TICKET_GENERAL',
     title: 'Single Day Pass',
     originalPrice: 599,
     price: 259,
@@ -53,6 +56,7 @@ const signupTickets = [
   },
   {
     id: 'gala',
+    productCode: 'TICKET_PREMIUM',
     title: 'Gala Pass',
     originalPrice: 9999,
     price: 8999,
@@ -289,6 +293,7 @@ export default function BuyPage({ onNavigateHome }) {
         phone: miniAppUser.phone,
         position: identity,
         price: selectedTicketInfo.price ?? 0,
+        productCode: selectedTicketInfo.productCode,
         ticketTitle: selectedTicketInfo.title,
         wechatOpenId: miniAppUser.wechatOpenId || '',
         wechatUnionId: miniAppUser.wechatUnionId || '',

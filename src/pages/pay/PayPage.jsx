@@ -1,10 +1,23 @@
 import { useEffect, useState } from 'react';
 import { heroDecor } from '../../landingData';
+import { getApiUrl } from '../../utils/api';
 import { getStoredMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './pay.css';
 
-const API_BASE = 'http://localhost:3000/api';
+const products = [
+  { productCode: 'TICKET_GENERAL', name: '普通票'  },
+  { productCode: 'TICKET_VIP', name: 'VIP票' },
+  { productCode: 'TICKET_EARLY_BIRD', name: '早鸟票' },
+  { productCode: 'TICKET_PREMIUM', name: '尊享票' },
+];
+
+function findSelectedProduct(orderInfo) {
+  if (orderInfo?.productCode) {
+    return products.find((item) => item.productCode === orderInfo.productCode) ?? null;
+  }
+  return null;
+}
 
 function IconLock() {
   return (
@@ -33,7 +46,7 @@ export default function PayPage({ onNavigateHome }) {
   }, []);
 
   const saveUser = async (status) => {
-    const response = await fetch(`${API_BASE}/users`, {
+    const response = await fetch(getApiUrl('/users'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -63,11 +76,17 @@ export default function PayPage({ onNavigateHome }) {
       return;
     }
 
+    const selectedProduct = findSelectedProduct(orderInfo);
+    if (!selectedProduct) {
+      setPayMsg({ type: 'error', text: 'Unknown product. Please go back and reselect your ticket.' });
+      return;
+    }
+
     setPaying(true);
     setPayMsg(null);
 
     try {
-      if (orderInfo.price === 0) {
+      if (selectedProduct.price === 0) {
         await saveUser('paid');
         setPayMsg({ type: 'success', text: 'Registration submitted successfully.' });
         setTimeout(() => {
@@ -77,20 +96,21 @@ export default function PayPage({ onNavigateHome }) {
       }
 
       const savedUser = await saveUser('pending');
-      const outTradeNo = `KACE_${savedUser.id}_${Date.now()}`;
-      const payRes = await fetch(`${API_BASE}/pay/h5`, {
+      const outTradeNo = `TKT-KACE_${savedUser.id}_${Date.now()}`;
+      const payRes = await fetch(getApiUrl('/pay/h5'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: savedUser.id,
           out_trade_no: outTradeNo,
           total: orderInfo.price,
+          productCode: selectedProduct.productCode,
           description: `KACE 2026 ${orderInfo.ticketTitle || 'Admission Ticket'}`,
         }),
       });
 
       const payResult = await payRes.json();
-      if (!payRes.ok || payResult.code !== 0 || !payResult.data?.h5_url) {
+      if (!payRes.ok || payResult.code !== 0) {
         setPayMsg({
           type: 'error',
           text: payResult.message || 'Payment service is temporarily unavailable. Please try again later.',
@@ -98,7 +118,26 @@ export default function PayPage({ onNavigateHome }) {
         return;
       }
 
-      window.location.href = payResult.data.h5_url;
+      const orderParams = {
+        eventId: 'EVT-2026-001',
+        productCode: payResult.data?.product_code || selectedProduct.productCode,
+        customOrderId: `TKT-MYORDER-${Date.now()}`,
+      };
+
+      console.log('跳转小程序支付页，订单参数: ' + JSON.stringify(orderParams));
+
+      const inMiniProgram =
+        window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
+
+      if (inMiniProgram && window.wx?.miniProgram?.navigateTo) {
+        window.wx.miniProgram.navigateTo({
+          url: `/pages/pay/pay?order=${encodeURIComponent(JSON.stringify(orderParams))}&language=zh-CN`,
+        });
+      } else if (inMiniProgram) {
+        setPayMsg({ type: 'error', text: '微信 JSSDK 未加载,请刷新或退出重进小程序。' });
+      } else {
+        setPayMsg({ type: 'error', text: '请在微信小程序中打开' });
+      }
     } catch (err) {
       console.error('Payment error:', err);
       setPayMsg({

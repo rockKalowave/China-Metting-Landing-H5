@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:3000/api';
+import { getApiUrl } from './api';
+
+const MINIAPP_USER_STORAGE_KEY = 'kace_miniapp_user';
 const TICKET_WALLET_STORAGE_KEY = 'kace_ticket_wallet';
 
 function parseJson(value) {
@@ -77,6 +79,14 @@ function readMiniAppUserFromUrl() {
   });
 }
 
+function readMiniAppUserFromCache() {
+  return normalizeMiniAppUser(parseJson(sessionStorage.getItem(MINIAPP_USER_STORAGE_KEY)));
+}
+
+function readMiniAppUserFromGlobal() {
+  return normalizeMiniAppUser(window.__KACE_MINIAPP_USER__ ?? window.KACE_MINIAPP?.user);
+}
+
 function requestMiniAppUserFromBridge() {
   return new Promise((resolve) => {
     const complete = (value) => {
@@ -141,7 +151,48 @@ async function isRunningInMiniProgram() {
 }
 
 export function getStoredMiniAppUser() {
-  return readMiniAppUserFromUrl();
+  const userFromUrl = readMiniAppUserFromUrl();
+  if (userFromUrl) {
+    sessionStorage.setItem(MINIAPP_USER_STORAGE_KEY, JSON.stringify(userFromUrl));
+    return userFromUrl;
+  }
+
+  const cachedUser = readMiniAppUserFromCache();
+  if (cachedUser) {
+    return cachedUser;
+  }
+
+  const globalUser = readMiniAppUserFromGlobal();
+  if (globalUser) {
+    sessionStorage.setItem(MINIAPP_USER_STORAGE_KEY, JSON.stringify(globalUser));
+    return globalUser;
+  }
+
+  return null;
+}
+
+export function appendMiniAppIdentity(path) {
+  const [pathWithoutHash, hash = ''] = path.split('#');
+  const [pathname, search = ''] = pathWithoutHash.split('?');
+  const params = new URLSearchParams(search);
+  const identity = getStoredMiniAppUser();
+
+  if (!identity) {
+    return path;
+  }
+
+  if (identity.phone) {
+    params.set('phone', identity.phone);
+  }
+  if (identity.wechatOpenId) {
+    params.set('wechat_open_id', identity.wechatOpenId);
+  }
+  if (identity.wechatUnionId) {
+    params.set('wechat_union_id', identity.wechatUnionId);
+  }
+
+  const query = params.toString();
+  return `${pathname}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`;
 }
 
 export function getStoredTicketWallet() {
@@ -167,18 +218,23 @@ export function getOrderLookupIdentity() {
 }
 
 export async function resolveMiniAppUser() {
-  const userFromUrl = readMiniAppUserFromUrl();
-  if (userFromUrl) {
-    return userFromUrl;
+  const storedUser = getStoredMiniAppUser();
+  if (storedUser) {
+    return storedUser;
   }
 
-  const globalUser = normalizeMiniAppUser(window.__KACE_MINIAPP_USER__ ?? window.KACE_MINIAPP?.user);
+  const globalUser = readMiniAppUserFromGlobal();
   if (globalUser) {
+    sessionStorage.setItem(MINIAPP_USER_STORAGE_KEY, JSON.stringify(globalUser));
     return globalUser;
   }
 
   if (await isRunningInMiniProgram()) {
-    return requestMiniAppUserFromBridge();
+    const bridgeUser = await requestMiniAppUserFromBridge();
+    if (bridgeUser) {
+      sessionStorage.setItem(MINIAPP_USER_STORAGE_KEY, JSON.stringify(bridgeUser));
+    }
+    return bridgeUser;
   }
 
   return null;
@@ -202,7 +258,7 @@ export async function syncMiniAppEntry(identity) {
     return null;
   }
 
-  const response = await fetch(`${API_BASE}/users/miniapp/entry`, {
+  const response = await fetch(getApiUrl('/users/miniapp/entry'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -232,7 +288,7 @@ export async function fetchTicketWallet(identity) {
     params.set('wechat_open_id', normalized.wechatOpenId);
   }
 
-  const response = await fetch(`${API_BASE}/users/ticket-wallet?${params.toString()}`);
+  const response = await fetch(`${getApiUrl('/users/ticket-wallet')}?${params.toString()}`);
   const data = await readApiResponse(response);
   cacheTicketWallet(data);
   return data;
