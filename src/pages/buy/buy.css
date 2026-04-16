@@ -1,0 +1,490 @@
+.buy-page {
+  min-height: 100vh;
+  background: #eff3fb;
+  color: #1f2d4d;
+}
+
+.buy-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #336cf7 0%, #2d66f6 100%);
+  color: #ffffff;
+  padding: 22px 20px 26px;
+}
+
+.buy-hero__back {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 12px;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.buy-hero__back svg {
+  width: 24px;
+  height: 24px;
+}
+
+.buy-hero__brand {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.buy-hero__content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 680px);
+  margin: 18px auto 0;
+  text-align: center;
+}
+
+.buy-hero__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+}
+
+.buy-hero__title {
+  margin: 0;
+  font-size: clamp(4.2rem, 17vw, 8rem);
+  line-height: 0.86;
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  text-align: left;
+}
+
+.buy-hero__title-side {
+  padding-top: 8px;
+  text-align: left;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.buy-hero__title-side p,
+.buy-hero__headline,
+.buy-hero__meta {
+  margin: 0;
+}
+
+.buy-hero__headline {
+  margin-top: 10px;
+  font-size: clamp(1.35rem, 6.3vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1.28;
+}
+
+.buy-hero__scroll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.buy-hero__scroll svg {
+  width: 32px;
+  height: 32px;
+}
+
+.buy-hero__meta {
+  margin-top: 16px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.buy-hero__decor {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.92;
+}
+
+.buy-hero__decor--left {
+  left: -34px;
+  bottom: -84px;
+  width: min(44vw, 210px);
+}
+
+.buy-hero__decor--right {
+  top: -26px;
+  right: -28px;
+  width: min(46vw, 220px);
+}
+
+.buy-main {
+  width: min(100%, 750px);
+  margin: 0 auto;
+  padding: 0 20px 36px;
+}
+
+.buy-section {
+  padding-top: 28px;
+}
+
+.buy-section__heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 24px;
+}
+
+.buy-section__heading h2,
+.buy-section--tickets h3 {
+  margin: 0;
+  color: #2d66f6;
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  line-height: 1;
+}
+
+.buy-section__heading p {
+  margin: 0;
+  color: #ff9c00;
+  font-size: clamp(1rem, 3.8vw, 1.5rem);
+  font-weight: 700;
+}
+
+.buy-field + .buy-field,
+.buy-field + .buy-progress-dots,
+.buy-progress-dots + .buy-section--tickets,
+.buy-section--tickets + .buy-msg,
+.buy-section--tickets + .buy-submit,
+.buy-msg + .buy-submit {
+  margin-top: 22px;
+}
+
+.buy-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #2d2d2d;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.buy-label span {
+  color: #ff9c00;
+}
+
+.buy-input,
+.buy-phone {
+  display: flex;
+  align-items: center;
+  min-height: 62px;
+  border: 2px solid #2d66f6;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(45, 102, 246, 0.05);
+}
+
+.buy-input input,
+.buy-input select,
+.buy-phone input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #2d66f6;
+  font-size: 1rem;
+  outline: none;
+}
+
+.buy-input input::placeholder,
+.buy-phone input::placeholder {
+  color: rgba(45, 102, 246, 0.55);
+}
+
+.buy-input__icon,
+.buy-input__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #2d66f6;
+}
+
+.buy-input__icon {
+  width: 58px;
+}
+
+.buy-input__icon svg,
+.buy-input__arrow svg {
+  width: 26px;
+  height: 26px;
+}
+
+.buy-input__arrow {
+  width: 46px;
+}
+
+.buy-input select {
+  appearance: none;
+  padding-right: 8px;
+  cursor: pointer;
+}
+
+.buy-phone__prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  min-height: 62px;
+  border-right: 2px solid #2d66f6;
+  color: #2d66f6;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.buy-phone input {
+  padding: 0 18px;
+}
+
+.buy-phone--locked {
+  background: #f5f8ff;
+}
+
+.buy-phone--locked input {
+  color: #214ebf;
+  cursor: default;
+}
+
+.buy-phone__hint {
+  margin: 8px 4px 0;
+  color: #5874b8;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.buy-progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.buy-progress-dots__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(45, 102, 246, 0.35);
+}
+
+.buy-progress-dots__dot--active {
+  width: 28px;
+  background: #2d66f6;
+}
+
+.buy-section--tickets h3 {
+  margin-bottom: 18px;
+}
+
+.buy-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.buy-ticket {
+  text-align: left;
+  padding: 20px 18px 22px;
+  border: 2px solid rgba(45, 102, 246, 0.12);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(45, 102, 246, 0.06);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.buy-ticket--active {
+  border-color: #2d66f6;
+  box-shadow: 0 22px 44px rgba(45, 102, 246, 0.12);
+  transform: translateY(-2px);
+}
+
+.buy-ticket__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buy-ticket__header h4 {
+  margin: 0;
+  color: #2d66f6;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.buy-ticket__header p {
+  margin: 0;
+  color: #b6bcc9;
+  font-size: 0.8rem;
+}
+
+.buy-ticket__original {
+  align-self: flex-start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef3ff;
+  color: #6f8de6;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.buy-ticket__status {
+  align-self: flex-start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff3de;
+  color: #ff9c00;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.buy-ticket__price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-top: 14px;
+  color: #ff9c00;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.buy-ticket__currency {
+  font-size: 1.35rem;
+}
+
+.buy-ticket__features {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.buy-ticket__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #2f2f2f;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.buy-ticket__feature--muted {
+  color: #484848;
+}
+
+.buy-ticket__feature-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #05c93f;
+}
+
+.buy-ticket__feature--muted .buy-ticket__feature-icon {
+  color: #ff4338;
+}
+
+.buy-ticket--disabled {
+  border-color: rgba(45, 102, 246, 0.12);
+  box-shadow: 0 12px 28px rgba(45, 102, 246, 0.04);
+  cursor: not-allowed;
+  opacity: 0.78;
+  transform: none;
+}
+
+.buy-msg {
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.buy-msg--error {
+  background: #fff1f1;
+  color: #db3a34;
+}
+
+.buy-msg--success {
+  background: #eafbf0;
+  color: #17a451;
+}
+
+.buy-submit {
+  width: 100%;
+  min-height: 68px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #336cf6 0%, #2d66f6 100%);
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  box-shadow: 0 20px 46px rgba(45, 102, 246, 0.18);
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .buy-ticket-grid {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-right: 18px;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .buy-ticket-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .buy-ticket {
+    flex: 0 0 min(284px, calc(100vw - 128px));
+    padding: 18px 16px 20px;
+    scroll-snap-align: start;
+  }
+
+  .buy-ticket__feature {
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .buy-hero {
+    padding-inline: 16px;
+  }
+
+  .buy-hero__back {
+    left: 16px;
+  }
+
+  .buy-main {
+    padding-inline: 16px;
+  }
+
+  .buy-hero__title-row {
+    gap: 10px;
+  }
+
+  .buy-hero__title-side {
+    font-size: 0.76rem;
+  }
+}

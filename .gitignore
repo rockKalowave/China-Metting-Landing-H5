@@ -1,0 +1,11 @@
+node_modules/
+dist/
+output/
+tmp_visual_slices/
+
+vite-stdout.log
+vite-stderr.log
+vite.pid
+
+.DS_Store
+Thumbs.db
