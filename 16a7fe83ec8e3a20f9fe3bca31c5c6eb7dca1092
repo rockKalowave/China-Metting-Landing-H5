@@ -1,0 +1,38 @@
+src/utils/miniAppUser.js
+  6a799421f3ace2a3 144,172,177
+.gitignore
+  6322884d7db1b790 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "16a7fe83ec8e3a20f9fe3bca31c5c6eb7dca1092",
+  "prompts": {
+    "6322884d7db1b790": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8cd7e872-0e2d-47ea-84da-643e6bee2797",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 54,
+      "total_deletions": 0,
+      "accepted_lines": 54,
+      "overriden_lines": 0
+    },
+    "6a799421f3ace2a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62644d6a-f768-467c-af44-47f40e4d9fb8",
+        "model": "<synthetic>"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 24,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
