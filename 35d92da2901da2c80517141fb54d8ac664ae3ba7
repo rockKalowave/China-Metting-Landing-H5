@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "35d92da2901da2c80517141fb54d8ac664ae3ba7",
+  "prompts": {
+    "6a799421f3ace2a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62644d6a-f768-467c-af44-47f40e4d9fb8",
+        "model": "<synthetic>"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 162,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
