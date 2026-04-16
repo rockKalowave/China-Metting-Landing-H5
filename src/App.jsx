@@ -12,6 +12,7 @@ import BuyPage from './pages/buy/buy';
 import PayPage from './pages/pay/PayPage';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
+import { navigateBackToMiniProgram } from './utils/miniAppBridge';
 import { resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 import { getInternalPath, toExternalPath } from './utils/routes';
 
@@ -63,7 +64,16 @@ function HomePage({
     <div className="landing-page">
       <header className="site-header">
         <div className="site-header__inner">
-          <button className="site-brand" onClick={() => scrollToSection('home')} type="button">
+          <button
+            className="site-brand"
+            onClick={() => {
+              if (navigateBackToMiniProgram()) {
+                return;
+              }
+              scrollToSection('home');
+            }}
+            type="button"
+          >
             <span className="site-brand__mark" />
             <span className="site-brand__text">Kalodata</span>
           </button>
