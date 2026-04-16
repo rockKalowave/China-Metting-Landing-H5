@@ -13,6 +13,7 @@ import PayPage from './pages/pay/PayPage';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
 import { resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
+import { getInternalPath, toExternalPath } from './utils/routes';
 
 const SPONSORSHIP_URL = 'https://www.wjx.top/vm/tU5XHKW.aspx#';
 const DEFAULT_ENTRY_STATE = {
@@ -201,7 +202,7 @@ function HomePage({
 }
 
 function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname || '/');
+  const [currentPath, setCurrentPath] = useState(getInternalPath());
   const [activeSection, setActiveSection] = useState('home');
   const [entryState, setEntryState] = useState(DEFAULT_ENTRY_STATE);
   const navSyncTimerRef = useRef(null);
@@ -248,7 +249,7 @@ function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname || '/');
+      setCurrentPath(getInternalPath());
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     };
 
@@ -292,8 +293,9 @@ function App() {
   }, [isSignupPage, isBuyPage, isTicketPage, isPayPage]);
 
   const navigateTo = (path) => {
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, '', path);
+    const externalPath = toExternalPath(path);
+    if (window.location.pathname !== externalPath) {
+      window.history.pushState({}, '', externalPath);
     }
 
     setCurrentPath(path);

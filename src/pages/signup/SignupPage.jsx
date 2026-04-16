@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { heroDecor } from '../../landingData';
+import { toExternalPath } from '../../utils/routes';
 import './signup.css';
 
 const homeNavItems = [
@@ -51,12 +52,12 @@ export default function SignupPage({ onNavigateHome }) {
     const navigationType = navigationEntries[0]?.type;
 
     if (navigationType === 'reload') {
-      window.location.replace('/');
+      window.location.replace(toExternalPath('/'));
     }
   }, []);
 
   const navigateHomeSection = (sectionId = '') => {
-    const target = sectionId ? `/#${sectionId}` : '/';
+    const target = sectionId ? toExternalPath(`/#${sectionId}`) : toExternalPath('/');
     window.location.assign(target);
   };
 

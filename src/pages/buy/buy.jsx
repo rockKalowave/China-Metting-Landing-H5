@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { heroDecor } from '../../landingData';
 import { getStoredMiniAppUser, resolveMiniAppUser } from '../../utils/miniAppUser';
+import { toExternalPath } from '../../utils/routes';
 import './buy.css';
 
 const identityOptions = ['Designer', 'Brand', 'Cross-border Seller', 'Service Provider', 'Creator / MCN'];
@@ -294,7 +295,7 @@ export default function BuyPage({ onNavigateHome }) {
       }),
     );
 
-    window.location.href = '/pay';
+    window.location.href = toExternalPath('/pay');
   };
 
   const handleBack = () => {
@@ -308,7 +309,7 @@ export default function BuyPage({ onNavigateHome }) {
       return;
     }
 
-    window.location.href = '/';
+    window.location.href = toExternalPath('/');
   };
 
   return (

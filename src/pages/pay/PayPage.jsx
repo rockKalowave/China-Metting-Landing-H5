@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { heroDecor } from '../../landingData';
 import { getStoredMiniAppUser } from '../../utils/miniAppUser';
+import { toExternalPath } from '../../utils/routes';
 import './pay.css';
 
 const API_BASE = 'http://localhost:3000/api';
@@ -27,7 +28,7 @@ export default function PayPage({ onNavigateHome }) {
   useEffect(() => {
     const navType = performance.getEntriesByType('navigation')[0]?.type;
     if (navType === 'reload') {
-      window.location.href = '/';
+      window.location.href = toExternalPath('/');
     }
   }, []);
 
@@ -70,7 +71,7 @@ export default function PayPage({ onNavigateHome }) {
         await saveUser('paid');
         setPayMsg({ type: 'success', text: 'Registration submitted successfully.' });
         setTimeout(() => {
-          window.location.href = '/ticket';
+          window.location.href = toExternalPath('/ticket');
         }, 1200);
         return;
       }

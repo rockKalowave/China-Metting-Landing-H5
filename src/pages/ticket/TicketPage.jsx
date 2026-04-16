@@ -5,6 +5,7 @@ import {
   getStoredTicketWallet,
   resolveTicketLookupIdentity,
 } from '../../utils/miniAppUser';
+import { toExternalPath } from '../../utils/routes';
 import './ticket.css';
 
 function DoubleChevron() {
@@ -73,7 +74,7 @@ export default function TicketPage({ onNavigateHome, ticketWallet: initialTicket
       return;
     }
 
-    window.location.href = '/';
+    window.location.href = toExternalPath('/');
   };
 
   if (loading) {
