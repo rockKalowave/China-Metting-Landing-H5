@@ -2,7 +2,6 @@
 import {
   audienceProfilePages,
   creatorTrackItems,
-  heroDecor,
   heroGallery,
   logoItems,
   navItems,
@@ -413,52 +412,16 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
 
       <main className="landing-main">
         <section className="mobile-hero" id="home">
-          <img
-            alt=""
-            aria-hidden="true"
-            className="mobile-hero__decor mobile-hero__decor--left"
-            src={heroDecor.left}
-          />
-          <img
-            alt=""
-            aria-hidden="true"
-            className="mobile-hero__decor mobile-hero__decor--right"
-            src={heroDecor.right}
-          />
+          <div className="mobile-hero__reference-frame">
+            <img
+              alt="首页首屏视觉"
+              className="mobile-hero__reference"
+              src={visualCuts.heroReference}
+            />
 
-          <div className="mobile-hero__copy">
-            <p className="mobile-hero__title">KACE 2026</p>
-            <p className="mobile-hero__subtitle">
-              中国最大的 AI 赋能
-              <br />
-              跨境电商
-              <br />
-              与海外达人
-              <br />
-              展览会
-            </p>
-            <p className="mobile-hero__english">
-              2026 Kalodata
-              <br />
-              AI Cross-border
-              <br />
-              E-commerce &amp; Influencer
-              <br />
-              Expo
-            </p>
-            <p className="mobile-hero__meta">
-              2026年8月4日 - 8月5日
-              <br />
-              深圳福田国际会展中心
-            </p>
-          </div>
-
-          <div className="mobile-hero__features">
-            <img alt="首页四大亮点" src={visualCuts.featureCards} />
-          </div>
-
-          <div className="mobile-hero__gallery">
-            <Marquee itemClassName="marquee__item--hero-gallery" items={heroGallery} />
+            <div className="mobile-hero__gallery mobile-hero__gallery--embedded">
+              <Marquee itemClassName="marquee__item--hero-gallery" items={heroGallery} />
+            </div>
           </div>
         </section>
 

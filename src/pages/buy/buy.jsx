@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { heroDecor } from '../../landingData';
 import { getStoredMiniAppUser, resolveMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
@@ -199,6 +199,7 @@ function Field({ children, label, required = false }) {
 
 export default function BuyPage({ onNavigateHome }) {
   const visibleTickets = useMemo(() => signupTickets.filter((ticket) => ticket.id !== 'single-day'), []);
+  const ticketGridRef = useRef(null);
   const [miniAppUser, setMiniAppUser] = useState(getStoredMiniAppUser());
   const [selectedTicket, setSelectedTicket] = useState(visibleTickets[0].id);
   const [formData, setFormData] = useState({
@@ -317,6 +318,46 @@ export default function BuyPage({ onNavigateHome }) {
     window.location.href = toExternalPath('/');
   };
 
+  const handleTicketScroll = (event) => {
+    const container = event.currentTarget;
+    const cards = Array.from(container.querySelectorAll('[data-ticket-id]'));
+
+    if (!cards.length) {
+      return;
+    }
+
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let nextTicketId = selectedTicket;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    cards.forEach((card) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - containerCenter);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nextTicketId = card.getAttribute('data-ticket-id') || nextTicketId;
+      }
+    });
+
+    if (nextTicketId !== selectedTicket) {
+      setSelectedTicket(nextTicketId);
+    }
+  };
+
+  const handleSelectTicket = (ticketId) => {
+    setSelectedTicket(ticketId);
+
+    const container = ticketGridRef.current;
+    const target = container?.querySelector(`[data-ticket-id="${ticketId}"]`);
+
+    target?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
+
   return (
     <div className="buy-page">
       <section className="buy-hero">
@@ -433,16 +474,10 @@ export default function BuyPage({ onNavigateHome }) {
             <p className="buy-phone__hint">The phone number is provided by the mini program identity and cannot be edited here.</p>
           </Field>
 
-          <div className="buy-progress-dots" aria-hidden="true">
-            <span className="buy-progress-dots__dot buy-progress-dots__dot--active" />
-            <span className="buy-progress-dots__dot" />
-            <span className="buy-progress-dots__dot" />
-          </div>
-
           <section className="buy-section buy-section--tickets">
             <h3>Tickets</h3>
 
-            <div className="buy-ticket-grid">
+            <div className="buy-ticket-grid" onScroll={handleTicketScroll} ref={ticketGridRef}>
               {visibleTickets.map((ticket) => {
                 const isActive = ticket.id === selectedTicket;
                 const isDisabled = ticket.purchasable === false;
@@ -456,9 +491,10 @@ export default function BuyPage({ onNavigateHome }) {
                           ? 'buy-ticket buy-ticket--active'
                           : 'buy-ticket'
                     }
+                    data-ticket-id={ticket.id}
                     disabled={isDisabled}
                     key={ticket.id}
-                    onClick={() => setSelectedTicket(ticket.id)}
+                    onClick={() => handleSelectTicket(ticket.id)}
                     type="button"
                   >
                     <div className="buy-ticket__header">
@@ -494,6 +530,19 @@ export default function BuyPage({ onNavigateHome }) {
                   </button>
                 );
               })}
+            </div>
+
+            <div className="buy-progress-dots buy-progress-dots--tickets" aria-hidden="true">
+              {visibleTickets.map((ticket) => (
+                <span
+                  className={
+                    ticket.id === selectedTicket
+                      ? 'buy-progress-dots__dot buy-progress-dots__dot--active'
+                      : 'buy-progress-dots__dot'
+                  }
+                  key={ticket.id}
+                />
+              ))}
             </div>
           </section>
 

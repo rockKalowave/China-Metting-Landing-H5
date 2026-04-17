@@ -1,4 +1,5 @@
 import creatorsAudienceSection from './assets/mobile-crops/creators-audience.png';
+import heroReferenceImage from './assets/mobile-crops/hero-reference.jpg';
 import industrySection from './assets/mobile-crops/industry.png';
 import introAboutSection from './assets/mobile-crops/intro-about.png';
 import organizerDesignSection from './assets/mobile-crops/organizer-design.png';
@@ -44,6 +45,7 @@ export const visualCuts = {
   agenda: publicAsset('landing-mobile/cuts/Frame 2147206549@2x.png'),
   featureCards: publicAsset('landing-mobile/cuts/Frame 2147206582@2x.png'),
   highlights: publicAsset('landing-mobile/cuts/Frame 2147206571@2x.png'),
+  heroReference: heroReferenceImage,
   markets: publicAsset('landing-mobile/cuts/Group 2147206523@2x.png'),
 };
 
