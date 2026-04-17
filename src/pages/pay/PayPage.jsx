@@ -117,7 +117,7 @@ export default function PayPage({ onNavigateHome }) {
       const orderParams = {
         eventId: 'EVT-2026-001',
         productCode: payResult.data?.product_code || selectedProduct.productCode,
-        customOrderId: `TKT-MYORDER-${Date.now()}`,
+        customOrderId: outTradeNo
       };
 
       console.log('跳转小程序支付页，订单参数: ' + JSON.stringify(orderParams));
