@@ -1,0 +1,42 @@
+src/utils/api.js
+  h_b2be70cfc5404d 1-2
+  13dfa9055a6afc42 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "4798a8353fd0e63284db0fc219edaa9c0a11fe54",
+  "prompts": {
+    "13dfa9055a6afc42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "980848dc-a8b3-4ef3-9bb0-c911abb27ad3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "6a799421f3ace2a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62644d6a-f768-467c-af44-47f40e4d9fb8",
+        "model": "<synthetic>"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 861,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
