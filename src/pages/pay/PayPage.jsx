@@ -92,7 +92,7 @@ export default function PayPage({ onNavigateHome }) {
       }
 
       const savedUser = await saveUser('pending');
-      const outTradeNo = `TKT-KACE_${savedUser.id}_${Date.now()}`;
+      const outTradeNo = `TKT-KACE-${savedUser.id}-${Date.now()}`;
       const payRes = await fetch(getApiUrl('/pay/h5'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

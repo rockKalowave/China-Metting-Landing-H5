@@ -16,7 +16,7 @@ import TicketPage from './pages/ticket/TicketPage';
 import { navigateBackToMiniProgram } from './utils/miniAppBridge';
 import { resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
-const SPONSORSHIP_URL = 'https://www.wjx.top/vm/tU5XHKW.aspx#';
+const SPONSORSHIP_URL = 'https://active.kalodata.com/survey/';
 const DEFAULT_ENTRY_STATE = {
   has_purchased: false,
   entry_label: '立即报名',
