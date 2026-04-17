@@ -1,0 +1,14 @@
+src/pages/pay/PayPage.jsx
+  h_b2be70cfc5404d 120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "2d703172a1dfa89bc30b323856fb7becf9e84000",
+  "prompts": {},
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
