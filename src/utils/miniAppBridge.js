@@ -13,14 +13,30 @@ export function navigateBackToMiniProgram(options = {}) {
   if (!isInMiniProgram()) {
     return false;
   }
-  if (!window.wx?.miniProgram?.navigateBack) {
+  const mp = window.wx?.miniProgram;
+  if (!mp) {
     return false;
   }
   try {
-    window.wx.miniProgram.navigateBack({ delta: options.delta ?? 1 });
+    const targetUrl = options.fallbackUrl ?? '/pages/index/index';
+    // 直接用 switchTab 跳转（适用于 tab 页面），失败则 fallback 到 reLaunch
+    if (mp.switchTab) {
+      mp.switchTab({
+        url: targetUrl,
+        fail() {
+          if (mp.reLaunch) {
+            mp.reLaunch({ url: targetUrl });
+          }
+        },
+      });
+    } else if (mp.reLaunch) {
+      mp.reLaunch({ url: targetUrl });
+    } else {
+      return false;
+    }
     return true;
   } catch (error) {
-    console.warn('wx.miniProgram.navigateBack failed', error);
+    console.warn('wx.miniProgram navigation failed', error);
     return false;
   }
 }
