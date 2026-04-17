@@ -14,6 +14,7 @@ import BuyPage from './pages/buy/buy';
 import PayPage from './pages/pay/PayPage';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
+import { navigateBackToMiniProgram } from './utils/miniAppBridge';
 import { resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
 const SPONSORSHIP_URL = 'https://www.wjx.top/vm/tU5XHKW.aspx#';
@@ -353,15 +354,14 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
     <div className={`landing-page landing-page--mobile${menuOpen ? ' landing-page--menu-open' : ''}`}>
       <header className="mobile-header">
         <button
-          aria-expanded={menuOpen}
-          aria-label={menuOpen ? '关闭导航' : '展开导航'}
-          className={menuOpen ? 'mobile-header__menu mobile-header__menu--open' : 'mobile-header__menu'}
-          onClick={() => setMenuOpen((current) => !current)}
+          aria-label="返回小程序主页"
+          className="mobile-header__back"
+          onClick={() => navigateBackToMiniProgram()}
           type="button"
         >
-          <span />
-          <span />
-          <span />
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
         <button
           className="mobile-header__brand"
@@ -372,6 +372,17 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
           type="button"
         >
           Kalodata
+        </button>
+        <button
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? '关闭导航' : '展开导航'}
+          className={menuOpen ? 'mobile-header__menu mobile-header__menu--open' : 'mobile-header__menu'}
+          onClick={() => setMenuOpen((current) => !current)}
+          type="button"
+        >
+          <span />
+          <span />
+          <span />
         </button>
       </header>
 

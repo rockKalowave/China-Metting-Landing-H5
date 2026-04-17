@@ -80,6 +80,7 @@ export default function PayPage({ onNavigateHome }) {
     setPaying(true);
     setPayMsg(null);
 
+    console.log(selectedProduct,'selectedProduct')
     try {
       if (selectedProduct.price === 0) {
         await saveUser('paid');

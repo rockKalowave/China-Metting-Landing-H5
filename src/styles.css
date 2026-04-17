@@ -1,5 +1,5 @@
 :root {
-  --landing-max-width: 390px;
+  --landing-max-width: 100%;
   --header-height: 56px;
   --header-blue: #2f67f5;
   --header-blue-strong: #1f54da;
@@ -88,9 +88,24 @@ a {
   cursor: pointer;
 }
 
-.mobile-header__menu {
+.mobile-header__back {
   position: absolute;
   left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--page-blue);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-header__menu {
+  position: absolute;
+  right: 14px;
   top: 50%;
   width: 28px;
   height: 28px;
@@ -297,7 +312,8 @@ a {
   position: fixed;
   z-index: 110;
   top: 82px;
-  right: max(10px, calc((100vw - min(100vw, var(--landing-max-width))) / 2 + 10px));
+  right: 10px;
+  /* right: max(10px, calc((100vw - min(100vw, var(--landing-max-width))) / 2 + 10px)); */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -925,6 +941,7 @@ a {
   margin-top: -1px;
 }
 
+.mobile-header__back:focus-visible,
 .mobile-header__menu:focus-visible,
 .mobile-header__brand:focus-visible,
 .mobile-menu__link:focus-visible,
