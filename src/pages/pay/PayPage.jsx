@@ -5,12 +5,7 @@ import { getStoredMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './pay.css';
 
-const products = [
-  { productCode: 'TICKET_GENERAL', name: '普通票'  },
-  { productCode: 'TICKET_VIP', name: 'VIP票' },
-  { productCode: 'TICKET_EARLY_BIRD', name: '早鸟票' },
-  { productCode: 'TICKET_PREMIUM', name: '尊享票' },
-];
+
 
 function findSelectedProduct(orderInfo) {
   if (orderInfo?.productCode) {
@@ -76,7 +71,7 @@ export default function PayPage({ onNavigateHome }) {
       return;
     }
 
-    const selectedProduct = findSelectedProduct(orderInfo);
+    const selectedProduct = orderInfo;
     if (!selectedProduct) {
       setPayMsg({ type: 'error', text: 'Unknown product. Please go back and reselect your ticket.' });
       return;
