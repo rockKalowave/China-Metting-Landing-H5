@@ -44,6 +44,11 @@ export const sectionImages = {
   partnersTitle: asset('合作伙伴.svg'),
 };
 
+export const ctaImages = {
+  default: asset('立即报名/默认.svg'),
+  hover: asset('立即报名/点击.svg'),
+};
+
 export const logoItems = [
   asset('行业首创/logo - 向左轮播/Group 12.png'),
   asset('行业首创/logo - 向左轮播/Group 13.png'),
