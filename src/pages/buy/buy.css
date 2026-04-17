@@ -161,8 +161,6 @@
 }
 
 .buy-field + .buy-field,
-.buy-field + .buy-progress-dots,
-.buy-progress-dots + .buy-section--tickets,
 .buy-section--tickets + .buy-msg,
 .buy-section--tickets + .buy-submit,
 .buy-msg + .buy-submit {
@@ -273,6 +271,10 @@
   display: flex;
   justify-content: center;
   gap: 8px;
+}
+
+.buy-progress-dots--tickets {
+  margin-top: 18px;
 }
 
 .buy-progress-dots__dot {
