@@ -261,6 +261,21 @@ a {
   object-fit: cover;
 }
 
+.login-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  z-index: 9999;
+  text-align: center;
+  pointer-events: none;
+}
+
 .floating-actions {
   position: fixed;
   z-index: 110;

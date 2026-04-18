@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { heroDecor } from '../../landingData';
+import { getStoredMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './signup.css';
 
@@ -47,6 +48,8 @@ function DoubleChevron() {
 }
 
 export default function SignupPage({ onNavigateHome }) {
+  const [loginMsg, setLoginMsg] = useState(null);
+
   useEffect(() => {
     const navigationEntries = window.performance.getEntriesByType?.('navigation') ?? [];
     const navigationType = navigationEntries[0]?.type;
@@ -63,6 +66,7 @@ export default function SignupPage({ onNavigateHome }) {
 
   return (
     <div className="signup-page">
+      {loginMsg && <div className="signup-toast">{loginMsg}</div>}
       <header className="signup-header">
         <div className="signup-header__inner">
           <button
@@ -95,7 +99,30 @@ export default function SignupPage({ onNavigateHome }) {
             ))}
           </nav>
 
-          <button className="signup-header__cta" onClick={() => document.getElementById('signup-qr')?.scrollIntoView({ behavior: 'smooth', block: 'center' })} type="button">
+          <button
+            className="signup-header__cta"
+            onClick={() => {
+              debugger
+              const miniAppUser = getStoredMiniAppUser();
+              if (miniAppUser?.phone) {
+                document.getElementById('signup-qr')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                setLoginMsg('请先登录授权，正在跳转...');
+                setTimeout(() => {
+                  const inMiniProgram =
+                    window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
+                  if (inMiniProgram && window.wx?.miniProgram?.navigateTo) {
+                    window.wx.miniProgram.navigateTo({ url: '/pages/authorize/authorize' });
+                  } else if (inMiniProgram) {
+                    setLoginMsg('微信 JSSDK 未加载，请刷新或退出重进小程序。');
+                  } else {
+                    setLoginMsg('请在微信小程序中打开');
+                  }
+                }, 1000);
+              }
+            }}
+            type="button"
+          >
             立即报名
           </button>
         </div>

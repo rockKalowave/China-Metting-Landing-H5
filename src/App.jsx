@@ -10,11 +10,10 @@ import {
   visualSections,
 } from './landingMobileData';
 import BuyPage from './pages/buy/buy';
-import PayPage from './pages/pay/PayPage';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
 import { navigateBackToMiniProgram } from './utils/miniAppBridge';
-import { resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
+import { getStoredMiniAppUser, resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
 const SPONSORSHIP_URL = 'https://active.kalodata.com/survey/';
 const DEFAULT_ENTRY_STATE = {
@@ -24,14 +23,36 @@ const DEFAULT_ENTRY_STATE = {
   ticket: null,
 };
 
-function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection }) {
+function navigateToMiniProgramAuth(setLoginMsg) {
+  setLoginMsg('请先登录授权，正在跳转...');
+  setTimeout(() => {
+    const inMiniProgram =
+      window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
+    if (inMiniProgram && window.wx?.miniProgram?.navigateTo) {
+      window.wx.miniProgram.navigateTo({ url: '/pages/authorize/authorize' });
+    } else if (inMiniProgram) {
+      setLoginMsg('微信 JSSDK 未加载，请刷新或退出重进小程序。');
+    } else {
+      setLoginMsg('请在微信小程序中打开');
+    }
+  }, 1000);
+}
+
+function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, setLoginMsg }) {
   const [activeAction, setActiveAction] = useState(null);
 
   const actions = [
     {
       id: 'register',
       label: entryLabel,
-      onClick: () => navigateTo(entryPath),
+      onClick: () => {
+        const miniAppUser = getStoredMiniAppUser();
+        if (miniAppUser?.phone) {
+          navigateTo(entryPath);
+        } else {
+          navigateToMiniProgramAuth(setLoginMsg);
+        }
+      },
     },
     {
       id: 'sponsorship',
@@ -332,6 +353,7 @@ function ReviewSection() {
 
 function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSection }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginMsg, setLoginMsg] = useState(null);
 
   useEffect(() => {
     const { overflow } = document.body.style;
@@ -403,11 +425,14 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
         </div>
       </div>
 
+      {loginMsg && <div className="login-toast">{loginMsg}</div>}
+
       <FloatingActions
         entryLabel={entryLabel}
         entryPath={entryPath}
         navigateTo={navigateTo}
         scrollToSection={scrollToSection}
+        setLoginMsg={setLoginMsg}
       />
 
       <main className="landing-main">
@@ -486,7 +511,6 @@ function App() {
   const isSignupPage = currentPath === '/signup';
   const isBuyPage = currentPath === '/buy';
   const isTicketPage = currentPath === '/ticket';
-  const isPayPage = currentPath === '/pay';
 
   useEffect(() => {
     let cancelled = false;
@@ -541,7 +565,7 @@ function App() {
   }, [isSignupPage]);
 
   useEffect(() => {
-    if (isSignupPage || isBuyPage || isTicketPage || isPayPage) {
+    if (isSignupPage || isBuyPage || isTicketPage) {
       return undefined;
     }
 
@@ -571,7 +595,7 @@ function App() {
       window.removeEventListener('scroll', updateActiveSection);
       window.removeEventListener('resize', updateActiveSection);
     };
-  }, [isSignupPage, isBuyPage, isTicketPage, isPayPage]);
+  }, [isSignupPage, isBuyPage, isTicketPage]);
 
   const navigateTo = (path) => {
     if (window.location.pathname !== path) {
@@ -603,10 +627,6 @@ function App() {
 
   if (isBuyPage) {
     return <BuyPage onNavigateHome={() => navigateTo('/')} />;
-  }
-
-  if (isPayPage) {
-    return <PayPage onNavigateHome={() => navigateTo('/')} />;
   }
 
   if (isTicketPage) {

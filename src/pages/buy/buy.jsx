@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { heroDecor } from '../../landingData';
+import { getApiUrl } from '../../utils/api';
 import { getStoredMiniAppUser, resolveMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './buy.css';
@@ -210,6 +211,7 @@ export default function BuyPage({ onNavigateHome }) {
     phone: getStoredMiniAppUser()?.phone || '',
   });
   const [submitMsg, setSubmitMsg] = useState(null);
+  const [paying, setPaying] = useState(false);
 
   const selectedTicketInfo = useMemo(
     () => visibleTickets.find((ticket) => ticket.id === selectedTicket) ?? visibleTickets[0],
@@ -250,7 +252,32 @@ export default function BuyPage({ onNavigateHome }) {
     setSubmitMsg(null);
   };
 
-  const handleSubmit = () => {
+  const saveUser = async (orderData, status) => {
+    const response = await fetch(getApiUrl('/users'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: orderData.name,
+        company: orderData.company,
+        position: orderData.position || '',
+        phone: orderData.phone,
+        wechat_open_id: orderData.wechatOpenId,
+        wechat_union_id: orderData.wechatUnionId,
+        id_card_no: orderData.idNumber,
+        email: '',
+        ticket_type: orderData.ticketTitle || '',
+        status,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.code !== 0 || !result.data?.id) {
+      throw new Error(result.message || 'Failed to save registration.');
+    }
+    return result.data;
+  };
+
+  const handleSubmit = async () => {
     const { company, idNumber, identity, name, phone } = formData;
 
     if (!identity || !company || !name || !idNumber || !phone) {
@@ -283,25 +310,86 @@ export default function BuyPage({ onNavigateHome }) {
       return;
     }
 
-    sessionStorage.setItem(
-      'kace_order',
-      JSON.stringify({
-        areaCode: '+86',
-        company,
-        idNumber,
-        name,
-        originalPrice: selectedTicketInfo.originalPrice ?? 0,
-        phone: miniAppUser.phone,
-        position: identity,
-        price: selectedTicketInfo.price ?? 0,
-        productCode: selectedTicketInfo.productCode,
-        ticketTitle: selectedTicketInfo.title,
-        wechatOpenId: miniAppUser.wechatOpenId || '',
-        wechatUnionId: miniAppUser.wechatUnionId || '',
-      }),
-    );
+    const orderData = {
+      areaCode: '+86',
+      company,
+      idNumber,
+      name,
+      originalPrice: selectedTicketInfo.originalPrice ?? 0,
+      phone: miniAppUser.phone,
+      position: identity,
+      price: selectedTicketInfo.price ?? 0,
+      productCode: selectedTicketInfo.productCode,
+      ticketTitle: selectedTicketInfo.title,
+      wechatOpenId: miniAppUser.wechatOpenId || '',
+      wechatUnionId: miniAppUser.wechatUnionId || '',
+    };
 
-    window.location.href = toExternalPath('/pay');
+    setPaying(true);
+    setSubmitMsg(null);
+
+    try {
+      if (orderData.price === 0) {
+        await saveUser(orderData, 'paid');
+        setSubmitMsg({ type: 'success', text: 'Registration submitted successfully.' });
+        setTimeout(() => {
+          window.location.href = toExternalPath('/ticket');
+        }, 1200);
+        return;
+      }
+
+      const savedUser = await saveUser(orderData, 'pending');
+      const outTradeNo = `TKT-KACE-${savedUser.id}-${Date.now()}`;
+      const payRes = await fetch(getApiUrl('/pay/h5'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: savedUser.id,
+          out_trade_no: outTradeNo,
+          total: orderData.price,
+          productCode: orderData.productCode,
+          description: `KACE 2026 ${orderData.ticketTitle || 'Admission Ticket'}`,
+        }),
+      });
+
+      const payResult = await payRes.json();
+      if (!payRes.ok || payResult.code !== 0) {
+        setSubmitMsg({
+          type: 'error',
+          text: payResult.message || 'Payment service is temporarily unavailable. Please try again later.',
+        });
+        return;
+      }
+
+      const orderParams = {
+        eventId: 'EVT-2026-001',
+        productCode: payResult.data?.product_code || orderData.productCode,
+        customOrderId: outTradeNo,
+      };
+
+      const inMiniProgram =
+        window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
+
+      if (inMiniProgram && window.wx?.miniProgram?.navigateTo) {
+        window.wx.miniProgram.navigateTo({
+          url: `/pages/pay/pay?order=${encodeURIComponent(JSON.stringify(orderParams))}&language=zh-CN`,
+        });
+      } else if (inMiniProgram) {
+        setSubmitMsg({ type: 'error', text: '微信 JSSDK 未加载,请刷新或退出重进小程序。' });
+      } else {
+        setSubmitMsg({ type: 'error', text: '请在微信小程序中打开' });
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      setSubmitMsg({
+        type: 'error',
+        text: err.message?.includes('ENOENT')
+          ? 'Payment certificate files are missing. Please contact the administrator.'
+          : (err.message || 'Network error. Please try again later.'),
+      });
+    } finally {
+      setPaying(false);
+    }
   };
 
   const handleBack = () => {
@@ -548,8 +636,8 @@ export default function BuyPage({ onNavigateHome }) {
 
           {submitMsg ? <div className={`buy-msg buy-msg--${submitMsg.type}`}>{submitMsg.text}</div> : null}
 
-          <button className="buy-submit" onClick={handleSubmit} type="button">
-            Continue
+          <button className="buy-submit" onClick={handleSubmit} disabled={paying} type="button">
+            {paying ? 'Processing...' : '确定'}
           </button>
         </section>
       </main>
