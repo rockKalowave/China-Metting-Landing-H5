@@ -1,0 +1,28 @@
+src/App.jsx
+  d695465536c9cdaf 26-29,31-35,38-39,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "07cb2819e78ac3d79561e8eb94c6ed2af0c91c0a",
+  "prompts": {
+    "d695465536c9cdaf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3376ceb-1e04-48f3-9102-00773fe9e88b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 12,
+      "total_deletions": 7,
+      "accepted_lines": 12,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
