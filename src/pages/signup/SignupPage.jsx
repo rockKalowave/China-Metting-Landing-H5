@@ -102,7 +102,6 @@ export default function SignupPage({ onNavigateHome }) {
           <button
             className="signup-header__cta"
             onClick={() => {
-              debugger
               const miniAppUser = getStoredMiniAppUser();
               if (miniAppUser?.phone) {
                 document.getElementById('signup-qr')?.scrollIntoView({ behavior: 'smooth', block: 'center' });

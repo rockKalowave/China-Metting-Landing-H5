@@ -23,17 +23,22 @@ const DEFAULT_ENTRY_STATE = {
   ticket: null,
 };
 
+function isInMiniProgram() {
+  return window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
+}
+
 function navigateToMiniProgramAuth(setLoginMsg) {
+  if (!isInMiniProgram()) {
+    setLoginMsg('请在微信小程序中打开');
+    return;
+  }
+
   setLoginMsg('请先登录授权，正在跳转...');
   setTimeout(() => {
-    const inMiniProgram =
-      window.__wxjs_environment === 'miniprogram' || /miniProgram/i.test(navigator.userAgent);
-    if (inMiniProgram && window.wx?.miniProgram?.navigateTo) {
-      window.wx.miniProgram.navigateTo({ url: '/pages/authorize/authorize' });
-    } else if (inMiniProgram) {
-      setLoginMsg('微信 JSSDK 未加载，请刷新或退出重进小程序。');
+    if (window.wx?.miniProgram?.navigateTo) {
+      window.wx.miniProgram.navigateTo({ url: '/pages/authorize/authorize?redirectUrl=pages/meeting/meeting' });
     } else {
-      setLoginMsg('请在微信小程序中打开');
+      setLoginMsg('微信 JSSDK 未加载，请刷新或退出重进小程序。');
     }
   }, 1000);
 }
