@@ -40,6 +40,12 @@ button {
 img {
   display: block;
   max-width: 100%;
+  -webkit-user-drag: none;
+}
+
+a,
+button {
+  -webkit-user-drag: none;
 }
 
 button,
@@ -230,9 +236,9 @@ a {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 26px;
+  bottom: 54px;
   z-index: 2;
-  padding: 0 14px;
+  padding: 0 12px;
 }
 
 .mobile-hero__gallery .marquee {
@@ -241,24 +247,25 @@ a {
 }
 
 .mobile-hero__gallery .marquee__track {
-  gap: 6px;
+  gap: 10px;
 }
 
 .mobile-hero__gallery .marquee__track--left {
-  animation-duration: 18s;
+  animation-duration: 20s;
 }
 
 .mobile-hero__gallery .marquee__item--hero-gallery {
-  width: 104px;
-  border-radius: 8px;
-  border: 1px solid rgba(137, 178, 255, 0.18);
-  box-shadow: 0 8px 18px rgba(12, 52, 150, 0.14);
+  width: min(48.4vw, 190px);
+  min-width: 172px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(194, 217, 255, 0.38);
+  box-shadow: 0 10px 20px rgba(10, 43, 126, 0.2);
 }
 
 .mobile-hero__gallery .marquee__item--hero-gallery img {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: auto;
 }
 
 .login-toast {
@@ -413,7 +420,7 @@ a {
 
 .agenda-section {
   position: relative;
-  padding: 20px 20px 22px;
+  padding: 0 20px 22px;
   background: linear-gradient(180deg, #eef3ff 0%, #e9f0ff 100%);
   scroll-margin-top: calc(var(--header-height) + 12px);
 }

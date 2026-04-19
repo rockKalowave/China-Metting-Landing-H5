@@ -463,38 +463,21 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
           priority
         />
 
-        <section className="agenda-section" id="content">
-          <div className="section-badge">展会内容</div>
+        <VisualSection
+          alt="展会内容"
+          className="landing-visual-section--flush"
+          id="content"
+          image={visualCuts.content}
+          priority
+        />
 
-          <div className="agenda-section__heading agenda-section__heading--main">
-            <span aria-hidden="true" className="agenda-section__backdrop-letter">
-              F
-            </span>
-            <h3 className="agenda-section__main-title">主会场议题</h3>
-          </div>
-
-          <div className="agenda-section__cards">
-            <img alt="主会场议题内容" loading="eager" src={visualCuts.agenda} />
-          </div>
-
-          <div className="agenda-section__heading agenda-section__heading--sub">
-            <span aria-hidden="true" className="agenda-section__backdrop-letter agenda-section__backdrop-letter--sub">
-              C
-            </span>
-            <h3 className="agenda-section__sub-title">分会场议题</h3>
-            <p className="agenda-section__sub-copy">（分会场议程，即将揭晓，敬请期待）</p>
-          </div>
-        </section>
-
-        <section className="landing-cut-section landing-cut-section--highlights" id="highlights">
-          <div className="section-badge">展会亮点</div>
-          <div className="landing-cut-section__frame landing-cut-section__frame--highlights">
-            <img alt="展会亮点" loading="eager" src={visualCuts.highlights} />
-          </div>
-          <div className="landing-cut-section__markets">
-            <img alt="五大市场" loading="eager" src={visualCuts.markets} />
-          </div>
-        </section>
+        <VisualSection
+          alt="展会亮点"
+          className="landing-visual-section--flush"
+          id="highlights"
+          image={visualCuts.highlights}
+          priority
+        />
 
         <IndustrySection />
         <VisualSection alt="核心价值" id="values" image={visualSections.values} />
@@ -516,6 +499,18 @@ function App() {
   const isSignupPage = currentPath === '/signup';
   const isBuyPage = currentPath === '/buy';
   const isTicketPage = currentPath === '/ticket';
+
+  useEffect(() => {
+    const preventNativeDrag = (event) => {
+      event.preventDefault();
+    };
+
+    document.addEventListener('dragstart', preventNativeDrag);
+
+    return () => {
+      document.removeEventListener('dragstart', preventNativeDrag);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

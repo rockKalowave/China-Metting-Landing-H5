@@ -34,6 +34,8 @@ export const heroGallery = [
   publicAsset('landing/01首屏/首屏轮播图/1.png'),
   publicAsset('landing/01首屏/首屏轮播图/2.png'),
   publicAsset('landing/01首屏/首屏轮播图/3.png'),
+  publicAsset('landing/01首屏/首屏轮播图/4.png'),
+  publicAsset('landing/01首屏/首屏轮播图/5.png'),
 ];
 
 export const heroDecor = {
@@ -43,8 +45,9 @@ export const heroDecor = {
 
 export const visualCuts = {
   agenda: publicAsset('landing-mobile/cuts/Frame 2147206549@2x.png'),
+  content: publicAsset('landing/移动端/展会内容.jpg'),
   featureCards: publicAsset('landing-mobile/cuts/Frame 2147206582@2x.png'),
-  highlights: publicAsset('landing-mobile/cuts/Frame 2147206571@2x.png'),
+  highlights: publicAsset('landing/展会亮点/展会亮点.jpg'),
   heroReference: heroReferenceImage,
   markets: publicAsset('landing-mobile/cuts/Group 2147206523@2x.png'),
 };
