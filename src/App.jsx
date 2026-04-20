@@ -1,6 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  audienceProfilePages,
   creatorTrackItems,
   heroGallery,
   logoItems,
@@ -108,12 +107,14 @@ function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, s
   );
 }
 
-function Marquee({ items, direction = 'left', itemClassName = '' }) {
+function Marquee({ items, direction = 'left', itemClassName = '', className = '', trackClassName = '' }) {
   const trackItems = useMemo(() => [...items, ...items], [items]);
+  const marqueeClassName = ['marquee', className].filter(Boolean).join(' ');
+  const trackClassNameValue = ['marquee__track', `marquee__track--${direction}`, trackClassName].filter(Boolean).join(' ');
 
   return (
-    <div className="marquee">
-      <div className={`marquee__track marquee__track--${direction}`}>
+    <div className={marqueeClassName}>
+      <div className={trackClassNameValue}>
         {trackItems.map((item, index) => (
           <div className={`marquee__item ${itemClassName}`.trim()} key={`${direction}-${index}`}>
             <img alt="" src={item} />
@@ -226,131 +227,39 @@ function CreatorValuesShowcase() {
 
   return (
     <section className="creator-values-showcase" id="creators">
-      <div className="section-badge">核心价值</div>
-
-      <div className="creator-values-slider" onScroll={handleSliderScroll} ref={sliderRef}>
-        {valueCreatorPages.map((pageItems, index) => (
-          <article className="creator-values-slide" key={`creator-page-${index + 1}`}>
-            <div className="creator-values-grid">
-              {pageItems.map((item) => (
-                <article className="creator-values-card" key={item.id}>
-                  <img alt={item.alt} loading="lazy" src={item.image} />
-                </article>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="creator-values-slider__pagination">
-        {valueCreatorPages.map((pageItems, index) => (
-          <button
-            aria-label={`Creator page ${index + 1}`}
-            className={activePage === index ? 'creator-values-slider__dot creator-values-slider__dot--active' : 'creator-values-slider__dot'}
-            key={`dot-${pageItems[0]?.id ?? index}`}
-            onClick={() => scrollToPage(index)}
-            type="button"
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AudienceUserIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 64 64">
-      <circle cx="32" cy="32" fill="#b9caff" r="32" />
-      <circle cx="32" cy="22" fill="none" r="8" stroke="#ffffff" strokeWidth="3.5" />
-      <path
-        d="M17 47v-4.5C17 35.597 23.268 30 31 30h2c7.732 0 14 5.597 14 12.5V47"
-        fill="none"
-        stroke="#ffffff"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="3.5"
+      <img
+        alt="拟邀请达人背景"
+        className="creator-values-showcase__background"
+        loading="lazy"
+        src={visualSections.invitedCreatorsBackground}
       />
-    </svg>
-  );
-}
 
-function AudienceProfilesShowcase() {
-  const sliderRef = useRef(null);
-  const [activePage, setActivePage] = useState(0);
+      <div className="creator-values-showcase__content">
+        <div className="creator-values-slider" onScroll={handleSliderScroll} ref={sliderRef}>
+          {valueCreatorPages.map((pageItems, index) => (
+            <article className="creator-values-slide" key={`creator-page-${index + 1}`}>
+              <div className="creator-values-grid">
+                {pageItems.map((item) => (
+                  <article className="creator-values-card" key={item.id}>
+                    <img alt={item.alt} loading="lazy" src={item.image} />
+                  </article>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
 
-  const handleSliderScroll = (event) => {
-    const container = event.currentTarget;
-    const nextPage = Math.round(container.scrollLeft / container.clientWidth);
-    setActivePage(Math.max(0, Math.min(audienceProfilePages.length - 1, nextPage)));
-  };
-
-  const scrollToPage = (pageIndex) => {
-    const container = sliderRef.current;
-    if (!container) {
-      return;
-    }
-
-    container.scrollTo({
-      left: container.clientWidth * pageIndex,
-      behavior: 'smooth',
-    });
-    setActivePage(pageIndex);
-  };
-
-  return (
-    <section className="audience-showcase" id="audience">
-      <div className="section-badge">用户画像</div>
-
-      <div className="audience-showcase__slider" onScroll={handleSliderScroll} ref={sliderRef}>
-        {audienceProfilePages.map((pageItems, index) => (
-          <article className="audience-showcase__slide" key={`audience-page-${index + 1}`}>
-            <div className="audience-showcase__cards">
-              {pageItems.map((item) => (
-                <article
-                  className={`audience-showcase__card audience-showcase__card--${item.layout}`}
-                  key={item.id}
-                >
-                  <div className="audience-showcase__icon">
-                    <AudienceUserIcon />
-                  </div>
-                  <div className="audience-showcase__content">
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="audience-showcase__pagination">
-        {audienceProfilePages.map((pageItems, index) => (
-          <button
-            aria-label={`Audience page ${index + 1}`}
-            className={activePage === index ? 'audience-showcase__dot audience-showcase__dot--active' : 'audience-showcase__dot'}
-            key={`audience-dot-${pageItems[0]?.id ?? index}`}
-            onClick={() => scrollToPage(index)}
-            type="button"
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ReviewSection() {
-  return (
-    <section className="review-section" id="review">
-      <div className="section-badge">往期回顾</div>
-
-      <div className="review-section__frame">
-        <img
-          alt="往期回顾"
-          className="review-section__image"
-          loading="lazy"
-          src={visualSections.review}
-        />
+        <div className="creator-values-slider__pagination">
+          {valueCreatorPages.map((pageItems, index) => (
+            <button
+              aria-label={`Creator page ${index + 1}`}
+              className={activePage === index ? 'creator-values-slider__dot creator-values-slider__dot--active' : 'creator-values-slider__dot'}
+              key={`dot-${pageItems[0]?.id ?? index}`}
+              onClick={() => scrollToPage(index)}
+              type="button"
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -449,8 +358,13 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
               src={visualCuts.heroReference}
             />
 
-            <div className="mobile-hero__gallery mobile-hero__gallery--embedded">
-              <Marquee itemClassName="marquee__item--hero-gallery" items={heroGallery} />
+            <div className="mobile-hero__gallery-slot">
+              <Marquee
+                className="mobile-hero__gallery"
+                itemClassName="marquee__item--hero-gallery"
+                items={heroGallery}
+                trackClassName="mobile-hero__gallery-track"
+              />
             </div>
           </div>
         </section>
@@ -482,10 +396,12 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
         <IndustrySection />
         <VisualSection alt="核心价值" id="values" image={visualSections.values} />
         <CreatorValuesShowcase />
-        <AudienceProfilesShowcase />
-        <ReviewSection />
-        <VisualSection alt="主办方介绍与大会设计" image={visualSections.organizerDesign} />
-        <VisualSection alt="联系我们与合作伙伴" id="contact" image={visualSections.contactPartners} />
+        <VisualSection alt="用户画像" id="audience" image={visualSections.audience} />
+        <VisualSection alt="往期回顾" id="review" image={visualSections.review} />
+        <VisualSection alt="主办方介绍" image={visualSections.organizer} />
+        <VisualSection alt="大会设计主视觉与展会平面图" image={visualSections.expoDesignMain} />
+        <VisualSection alt="大会设计补充视觉" image={visualSections.expoDesignSecondary} />
+        <VisualSection alt="联系我们" id="contact" image={visualSections.contact} />
       </main>
     </div>
   );
