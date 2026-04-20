@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { heroDecor } from '../../landingData';
+import { useEffect, useMemo, useState } from 'react';
 import {
   fetchTicketWallet,
   getStoredTicketWallet,
@@ -8,24 +7,29 @@ import {
 import { toExternalPath } from '../../utils/routes';
 import './ticket.css';
 
-function DoubleChevron() {
+const publicAsset = (relativePath) => encodeURI(`${import.meta.env.BASE_URL}${relativePath}`);
+const ticketWalletBackground = publicAsset('landing/小程序购票页/票夹底图.png');
+const ticketWalletHomeButton = publicAsset('landing/小程序购票页/按钮 - 票夹 - 返回首页.svg');
+
+function TicketStatus({ actionLabel = '返回首页', message, onAction }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path
-        d="m6 6 6 6 6-6M6 12l6 6 6-6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.2"
-      />
-    </svg>
+    <div className="ticket-page">
+      <main className="ticket-main">
+        <section className="ticket-status-card">
+          <p className="ticket-status-card__text">{message}</p>
+          <button className="ticket-status-card__button" onClick={onAction} type="button">
+            {actionLabel}
+          </button>
+        </section>
+      </main>
+    </div>
   );
 }
 
 export default function TicketPage({ onNavigateHome, ticketWallet: initialTicketWallet }) {
-  const [ticketWallet, setTicketWallet] = useState(initialTicketWallet ?? getStoredTicketWallet());
-  const [loading, setLoading] = useState(!initialTicketWallet && !getStoredTicketWallet());
+  const storedTicketWallet = getStoredTicketWallet();
+  const [ticketWallet, setTicketWallet] = useState(initialTicketWallet ?? storedTicketWallet);
+  const [loading, setLoading] = useState(!initialTicketWallet && !storedTicketWallet);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -42,17 +46,21 @@ export default function TicketPage({ onNavigateHome, ticketWallet: initialTicket
       try {
         const lookupIdentity = await resolveTicketLookupIdentity();
         if (!lookupIdentity) {
-          throw new Error('未找到票夹信息，请先报名或在小程序内打开');
+          throw new Error('未找到票夹信息，请先购票或在小程序内打开');
         }
 
         const nextTicketWallet = await fetchTicketWallet(lookupIdentity);
+        if (!nextTicketWallet) {
+          throw new Error('未找到票夹信息，请稍后重试');
+        }
+
         if (!cancelled) {
           setTicketWallet(nextTicketWallet);
           setError('');
         }
       } catch (requestError) {
         if (!cancelled) {
-          setError(requestError.message || '未找到票夹信息');
+          setError(requestError.message || '未找到票夹信息，请稍后重试');
         }
       } finally {
         if (!cancelled) {
@@ -77,91 +85,48 @@ export default function TicketPage({ onNavigateHome, ticketWallet: initialTicket
     window.location.href = toExternalPath('/');
   };
 
+  const ticketTypeLabel = useMemo(
+    () => ticketWallet?.ticket_type || ticketWallet?.ticketType || 'KACE 2026 门票',
+    [ticketWallet],
+  );
+
+  const ticketQrUrl = useMemo(
+    () => ticketWallet?.qr_code_url || ticketWallet?.qrCodeUrl || ticketWallet?.qr_code || '',
+    [ticketWallet],
+  );
+
   if (loading) {
-    return (
-      <div className="ticket-page">
-        <main className="ticket-main">
-          <div className="ticket-card ticket-card--status">
-            <p className="ticket-status__text">正在加载票夹信息...</p>
-          </div>
-        </main>
-      </div>
-    );
+    return <TicketStatus message="正在加载票夹信息..." onAction={handleBackHome} />;
   }
 
   if (!ticketWallet || error) {
-    return (
-      <div className="ticket-page">
-        <main className="ticket-main">
-          <div className="ticket-card ticket-card--status">
-            <p className="ticket-status__text">{error || '未找到票夹信息'}</p>
-            <button className="ticket-action-btn ticket-action-btn--solid" onClick={handleBackHome} type="button">
-              返回首页
-            </button>
-          </div>
-        </main>
-      </div>
-    );
+    return <TicketStatus message={error || '未找到票夹信息'} onAction={handleBackHome} />;
   }
 
   return (
     <div className="ticket-page">
       <main className="ticket-main">
-        <div className="ticket-card">
-          <div className="ticket-card__top">
-            <div className="ticket-card__logo-area">
-              <span className="ticket-card__brand">Kalodata</span>
+        <section className="ticket-wallet-card" aria-label="我的票夹">
+          <img alt="KACE 2026 票夹底图" className="ticket-wallet-card__background" src={ticketWalletBackground} />
+
+          <div className="ticket-wallet-card__overlay">
+            <div className="ticket-wallet-card__ticket-type" title={ticketTypeLabel}>
+              <span>{ticketTypeLabel}</span>
             </div>
-            <div className="ticket-card__title-area">
-              <h1 className="ticket-card__title">KACE<br />2026</h1>
-              <p className="ticket-card__subtitle">AI赋能跨境电商与海外达人合作展览会</p>
-              <p className="ticket-card__sub-en">2026 Kalodata AI Cross-border E-commerce &amp; Influencer Expo</p>
+
+            <div className="ticket-wallet-card__qr-slot">
+              {ticketQrUrl ? (
+                <img alt="KACE 2026 入场二维码" className="ticket-wallet-card__qr" src={ticketQrUrl} />
+              ) : (
+                <div className="ticket-wallet-card__qr-empty">二维码生成中</div>
+              )}
             </div>
-            <div className="ticket-card__actions">
-              <button className="ticket-action-btn" onClick={handleBackHome} type="button">返回首页</button>
-              <button className="ticket-action-btn ticket-action-btn--solid" type="button">我的票夹</button>
-            </div>
+
+            <button className="ticket-wallet-card__home-button" onClick={handleBackHome} type="button">
+              <img alt="" aria-hidden="true" src={ticketWalletHomeButton} />
+            </button>
           </div>
-
-          <div className="ticket-divider">
-            {[...Array(20)].map((_, i) => (
-              <span key={i} className="ticket-divider__dot" />
-            ))}
-          </div>
-
-          <div className="ticket-card__body">
-            <img alt="" aria-hidden="true" className="ticket-card__decor ticket-card__decor--left" src={heroDecor.left} />
-            <img alt="" aria-hidden="true" className="ticket-card__decor ticket-card__decor--right" src={heroDecor.right} />
-
-            <div className="ticket-success">
-              <p className="ticket-success__text">恭喜您已成功购票</p>
-              <p className="ticket-success__event">2026 Kalodata AI Cross-border E-commerce &amp; Influencer Expo</p>
-
-              <div className="ticket-success__arrow">
-                <DoubleChevron />
-              </div>
-
-              <div className="ticket-type-badge">{ticketWallet.ticket_type || 'KACE 2026 门票'}</div>
-              <p className="ticket-tip">活动当天出示二维码即可核销入场</p>
-
-              <div className="ticket-qr-wrap">
-                <div className="ticket-qr-frame">
-                  <img alt="KACE 2026 入场二维码" className="ticket-qr" src={ticketWallet.qr_code_url} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="ticket-card__footer">
-            <p className="ticket-info-row">持票人 | {ticketWallet.name || '-'}</p>
-            <p className="ticket-info-row">手机号 | {ticketWallet.phone || '-'}</p>
-            <p className="ticket-info-row">公司 | {ticketWallet.company || '-'}</p>
-            <p className="ticket-info-row">时间 | {ticketWallet.event_date || '2026.08.04 - 2026.08.05'}</p>
-            <p className="ticket-info-row">地点 | {ticketWallet.location || '深圳福田国际会展中心'}</p>
-            <p className="ticket-greeting">现场见</p>
-            <p className="ticket-policy">请妥善保管二维码，勿重复转发</p>
-          </div>
-        </div>
+        </section>
       </main>
     </div>
   );

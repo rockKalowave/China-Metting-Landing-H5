@@ -1,319 +1,144 @@
-/* 页面容器 */
 .ticket-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #2a4fd9 0%, #1e3fb8 50%, #162896 100%);
+  background: #f6f8ff;
   color: #ffffff;
 }
 
-/* 主内容区域 */
 .ticket-main {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: calc(100vh);
-  padding: 40px 20px;
+  align-items: flex-start;
+  padding: 20px 16px 32px;
 }
 
-/* 票夹卡片 */
-.ticket-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, #3b6bff 0%, #2563eb 50%, #1d4ed8 100%);
-  border-radius: 28px;
-  overflow: hidden;
+.ticket-wallet-card {
   position: relative;
-  box-shadow:
-    0 30px 80px rgba(30, 58, 138, 0.5),
-    0 15px 35px rgba(37, 99, 235, 0.3);
+  width: min(100%, 390px);
 }
 
-.ticket-card--status {
+.ticket-wallet-card__background {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ticket-wallet-card__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.ticket-wallet-card__ticket-type {
+  position: absolute;
+  left: 25.72%;
+  top: 25.52%;
+  width: 48.56%;
+  height: 2.37%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #ffffff;
+  font-size: clamp(0.85rem, 2.7vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.ticket-wallet-card__ticket-type span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-wallet-card__qr-slot {
+  position: absolute;
+  left: 18.46%;
+  top: 48.67%;
+  width: 62.97%;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.ticket-wallet-card__qr,
+.ticket-wallet-card__qr-empty {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ticket-wallet-card__qr {
+  object-fit: contain;
+}
+
+.ticket-wallet-card__qr-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2f67f5;
+  font-size: clamp(0.82rem, 2.6vw, 1.15rem);
+  font-weight: 700;
+}
+
+.ticket-wallet-card__home-button {
+  position: absolute;
+  left: 6.83%;
+  top: 88.92%;
+  width: 86.34%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ticket-wallet-card__home-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ticket-status-card {
+  width: min(100%, 390px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 56px 28px;
+  padding: 40px 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #2f67f5 0%, #2156de 100%);
+  box-shadow: 0 18px 36px rgba(25, 68, 179, 0.18);
 }
 
-/* 票卡顶部 */
-.ticket-card__top {
-  padding: 28px 32px 12px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 16px;
-  align-items: start;
-}
-
-.ticket-card__logo-area {
-  padding-top: 4px;
-}
-
-.ticket-card__brand {
-  font-size: 16px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  letter-spacing: 0.02em;
-}
-
-.ticket-card__title-area {
-  text-align: left;
-}
-
-.ticket-card__title {
-  margin: 0 0 4px;
-  font-size: 36px;
-  font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  color: #ffffff;
-}
-
-.ticket-card__subtitle {
-  margin: 0 0 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
-  line-height: 1.45;
-}
-
-.ticket-card__sub-en {
+.ticket-status-card__text {
   margin: 0;
-  font-size: 11px;
-  font-weight: 400;
-  color: rgba(200, 220, 255, 0.75);
-  line-height: 1.35;
-}
-
-.ticket-card__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 4px;
-}
-
-.ticket-action-btn {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 160ms ease;
-}
-
-.ticket-action-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.ticket-action-btn--solid {
-  background: #ffffff;
-  color: #2563eb;
-  border-color: #ffffff;
-}
-
-.ticket-action-btn--solid:hover {
-  background: rgba(255, 255, 255, 0.92);
-}
-
-/* 锯齿分割线 */
-.ticket-divider {
-  height: 26px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 12px;
-  position: relative;
-  background:
-    radial-gradient(circle at 0% 50%, transparent 14px, rgba(255, 255, 255, 0.08) 14px),
-    radial-gradient(circle at 100% 50%, transparent 14px, rgba(255, 255, 255, 0.08) 14px);
-  background-size: calc(100% + 28px) 100%;
-  background-position: -14px 0;
-}
-
-.ticket-divider::before,
-.ticket-divider::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b6bff 0%, #2563eb 100%);
-}
-
-.ticket-divider::before {
-  left: -9px;
-  transform: translateX(-50%);
-}
-
-.ticket-divider::after {
-  right: -9px;
-  transform: translateX(50%);
-}
-
-.ticket-divider__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(147, 184, 255, 0.55);
-  flex-shrink: 0;
-}
-
-/* 票卡主体内容 */
-.ticket-card__body {
-  position: relative;
-  padding: 24px 32px 32px;
-  overflow: hidden;
-  min-height: 480px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.ticket-card__decor {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.08;
-}
-
-.ticket-card__decor--left {
-  left: -60px;
-  top: 120px;
-  width: 140px;
-  transform: rotate(-15deg);
-}
-
-.ticket-card__decor--right {
-  right: -60px;
-  top: 80px;
-  width: 160px;
-  transform: rotate(15deg);
-}
-
-/* 成功提示区域 */
-.ticket-success {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  width: 100%;
-}
-
-.ticket-success__text {
-  font-size: 26px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 8px;
-}
-
-.ticket-success__event {
-  font-size: 17px;
-  font-weight: 500;
-  color: rgba(230, 240, 255, 0.92);
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.ticket-success__arrow {
-  margin-bottom: 16px;
-  color: rgba(165, 199, 255, 0.7);
-}
-
-.ticket-success__arrow svg {
-  width: 28px;
-  height: 28px;
-}
-
-/* 票种标签 */
-.ticket-type-badge {
-  display: inline-block;
-  padding: 10px 24px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  margin-bottom: 12px;
-}
-
-.ticket-tip {
-  font-size: 13px;
-  color: rgba(210, 225, 255, 0.85);
-  margin-bottom: 20px;
-}
-
-/* 二维码区域 */
-.ticket-qr-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.ticket-qr-frame {
-  width: 240px;
-  height: 240px;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 18px;
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.15),
-    inset 0 0 0 2px rgba(59, 107, 255, 0.1);
-}
-
-.ticket-qr {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* 底部信息 */
-.ticket-card__footer {
-  padding: 20px 32px 28px;
-  text-align: center;
-  background: rgba(29, 78, 216, 0.4);
-  border-top: 1px solid rgba(147, 184, 255, 0.15);
-}
-
-.ticket-info-row {
-  font-size: 14px;
-  color: rgba(220, 235, 255, 0.9);
-  margin: 0 0 6px;
-  font-weight: 500;
-}
-
-.ticket-greeting {
-  font-size: 20px;
-  font-weight: 800;
-  color: #fbbf24;
-  margin: 16px 0 8px;
-  letter-spacing: 0.06em;
-}
-
-.ticket-policy {
-  font-size: 13px;
-  color: rgba(190, 215, 255, 0.7);
-  margin: 0;
-  cursor: pointer;
-  transition: color 160ms ease;
-}
-
-.ticket-policy:hover {
-  color: rgba(220, 235, 255, 0.9);
-}
-
-.ticket-status__text {
-  margin: 0;
+  color: rgba(255, 255, 255, 0.96);
   font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  text-align: center;
+  font-weight: 600;
   line-height: 1.7;
+  text-align: center;
+}
+
+.ticket-status-card__button {
+  min-width: 132px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2f67f5;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 375px) {
+  .ticket-main {
+    padding: 16px 12px 28px;
+  }
+
+  .ticket-wallet-card {
+    width: 100%;
+  }
 }

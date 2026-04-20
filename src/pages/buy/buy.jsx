@@ -1,75 +1,59 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { heroDecor } from '../../landingData';
 import { getApiUrl } from '../../utils/api';
 import { getStoredMiniAppUser, resolveMiniAppUser } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './buy.css';
 
-const identityOptions = ['Designer', 'Brand', 'Cross-border Seller', 'Service Provider', 'Creator / MCN'];
+const publicAsset = (relativePath) => encodeURI(`${import.meta.env.BASE_URL}${relativePath}`);
+const buyHeroImage = publicAsset('landing/票种设计.png');
+const identityOptions = ['设计师', '品牌方', '跨境卖家', '服务商', '达人 / MCN'];
 
 const signupTickets = [
   {
     id: 'early-bird',
     productCode: 'TICKET_EARLY_BIRD',
-    title: 'Early Bird 2-Day Pass',
+    title: '早鸟双日票',
     originalPrice: 599,
     price: 0,
-    note: 'Free before 2026-07-31 23:59',
+    note: '7.31日23.59分停止售卖',
     features: [
-      { text: 'Two-day access to the full expo and main program', included: true },
-      { text: 'Access to brand showcases and experience zones', included: true },
-      { text: 'On-site check-in gifts and stamp collection', included: true },
-      { text: 'Creator and brand interaction areas', included: true },
-      { text: 'No entry to the premium business matching area', included: false },
-    ],
-  },
-  {
-    id: 'vip',
-    productCode: 'TICKET_VIP',
-    title: 'VIP Pass',
-    originalPrice: 1999,
-    price: 1299,
-    note: 'Two-day access with VIP privileges',
-    features: [
-      { text: 'Two-day full expo access', included: true },
-      { text: 'Entry to the business matching area', included: true },
-      { text: 'VIP seating in the keynote area', included: true },
-      { text: 'Premium event gift bag', included: true },
-      { text: 'Business lunch included', included: true },
-      { text: 'VIP networking group after the event', included: true },
+      { text: '双日畅行全展区与完整议程', included: true },
+      { text: '解锁全体验区与品牌展位', included: true },
+      { text: '现场打卡集章，兑换限量周边', included: true },
+      { text: '展商品牌互动，领取专属福利', included: true },
+      { text: '本票种不含“商达撮合区”入场权限', included: false },
     ],
   },
   {
     id: 'single-day',
     productCode: 'TICKET_GENERAL',
-    title: 'Single Day Pass',
+    title: '智享单日票',
     originalPrice: 599,
     price: 259,
-    note: 'Choose one day only',
+    note: '8月4日、8月5日（可任选一天）',
     features: [
-      { text: 'Access for one selected day', included: true },
-      { text: 'Expo and program access for the selected day', included: true },
-      { text: 'Access to showcases and experience zones', included: true },
-      { text: 'On-site check-in gifts and stamp collection', included: true },
-      { text: 'Creator and brand interaction areas', included: true },
-      { text: 'No entry to the premium business matching area', included: false },
+      { text: '择日出席，智享全程', included: true },
+      { text: '单日畅行全展区与完整议程', included: true },
+      { text: '解锁全体验区与品牌展位', included: true },
+      { text: '现场打卡集章，兑换限量周边', included: true },
+      { text: '展商品牌互动，领取专属福利', included: true },
+      { text: '本票种不含“商达撮合区”入场权限', included: false },
     ],
   },
   {
-    id: 'gala',
-    productCode: 'TICKET_PREMIUM',
-    title: 'Gala Pass',
-    originalPrice: 9999,
-    price: 8999,
-    note: 'Limited availability',
-    purchasable: false,
+    id: 'vip',
+    productCode: 'TICKET_VIP',
+    title: 'VIP通票',
+    originalPrice: 1999,
+    price: 1299,
+    note: '双日通行，含商达撮合区权益',
     features: [
-      { text: 'Includes all VIP benefits', included: true },
-      { text: 'Evening gala admission', included: true },
-      { text: 'Private guest networking session', included: true },
-      { text: 'Reserved dinner seating and gifts', included: true },
-      { text: 'Priority post-event networking support', included: true },
-      { text: 'Limited seats available', included: true },
+      { text: '双日畅行全展区与完整议程', included: true },
+      { text: '含“商达撮合区”入场与对接权益', included: true },
+      { text: '重点论坛优先席位', included: true },
+      { text: 'VIP礼包与优先服务', included: true },
+      { text: '展商品牌互动，领取专属福利', included: true },
+      { text: '高价值商机撮合与资源链接', included: true },
     ],
   },
 ];
@@ -99,21 +83,6 @@ function IconChevron() {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-function IconDoubleChevron() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path
-        d="m6 7 6 6 6-6M6 13l6 6 6-6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.1"
       />
     </svg>
   );
@@ -199,7 +168,7 @@ function Field({ children, label, required = false }) {
 }
 
 export default function BuyPage({ onNavigateHome }) {
-  const visibleTickets = useMemo(() => signupTickets.filter((ticket) => ticket.id !== 'single-day'), []);
+  const visibleTickets = useMemo(() => signupTickets, []);
   const ticketGridRef = useRef(null);
   const [miniAppUser, setMiniAppUser] = useState(getStoredMiniAppUser());
   const [selectedTicket, setSelectedTicket] = useState(visibleTickets[0].id);
@@ -272,7 +241,7 @@ export default function BuyPage({ onNavigateHome }) {
 
     const result = await response.json();
     if (!response.ok || result.code !== 0 || !result.data?.id) {
-      throw new Error(result.message || 'Failed to save registration.');
+      throw new Error(result.message || '保存报名信息失败');
     }
     return result.data;
   };
@@ -281,32 +250,27 @@ export default function BuyPage({ onNavigateHome }) {
     const { company, idNumber, identity, name, phone } = formData;
 
     if (!identity || !company || !name || !idNumber || !phone) {
-      setSubmitMsg({ type: 'error', text: 'Please complete all required fields.' });
+      setSubmitMsg({ type: 'error', text: '请填写所有必填项' });
       return;
     }
 
     if (!/^[1-9]\d{16}[\dX]$/.test(idNumber)) {
-      setSubmitMsg({ type: 'error', text: 'Please enter a valid 18-digit ID card number.' });
+      setSubmitMsg({ type: 'error', text: '请输入正确的18位身份证号' });
       return;
     }
 
     if (!/^1\d{10}$/.test(phone)) {
-      setSubmitMsg({ type: 'error', text: 'Only +86 mainland China mobile numbers are supported.' });
+      setSubmitMsg({ type: 'error', text: '仅支持中国大陆 +86 手机号' });
       return;
     }
 
     if (!miniAppUser?.phone) {
-      setSubmitMsg({ type: 'error', text: 'Please authorize your phone number in the mini program first.' });
+      setSubmitMsg({ type: 'error', text: '请先在小程序内完成手机号授权' });
       return;
     }
 
     if (miniAppUser.phone !== phone) {
-      setSubmitMsg({ type: 'error', text: 'Phone number must match the mini program identity.' });
-      return;
-    }
-
-    if (selectedTicketInfo.purchasable === false) {
-      setSubmitMsg({ type: 'error', text: 'This ticket type is not available for purchase yet.' });
+      setSubmitMsg({ type: 'error', text: '手机号需与小程序授权信息一致' });
       return;
     }
 
@@ -331,7 +295,7 @@ export default function BuyPage({ onNavigateHome }) {
     try {
       if (orderData.price === 0) {
         await saveUser(orderData, 'paid');
-        setSubmitMsg({ type: 'success', text: 'Registration submitted successfully.' });
+        setSubmitMsg({ type: 'success', text: '报名信息提交成功' });
         setTimeout(() => {
           window.location.href = toExternalPath('/ticket');
         }, 1200);
@@ -348,7 +312,7 @@ export default function BuyPage({ onNavigateHome }) {
           out_trade_no: outTradeNo,
           total: orderData.price,
           productCode: orderData.productCode,
-          description: `KACE 2026 ${orderData.ticketTitle || 'Admission Ticket'}`,
+          description: `KACE 2026 ${orderData.ticketTitle || '入场门票'}`,
         }),
       });
 
@@ -356,7 +320,7 @@ export default function BuyPage({ onNavigateHome }) {
       if (!payRes.ok || payResult.code !== 0) {
         setSubmitMsg({
           type: 'error',
-          text: payResult.message || 'Payment service is temporarily unavailable. Please try again later.',
+          text: payResult.message || '支付服务暂不可用，请稍后重试',
         });
         return;
       }
@@ -375,7 +339,7 @@ export default function BuyPage({ onNavigateHome }) {
           url: `/pages/pay/pay?order=${encodeURIComponent(JSON.stringify(orderParams))}&language=zh-CN`,
         });
       } else if (inMiniProgram) {
-        setSubmitMsg({ type: 'error', text: '微信 JSSDK 未加载,请刷新或退出重进小程序。' });
+        setSubmitMsg({ type: 'error', text: '微信 JSSDK 未加载，请刷新或退出后重进小程序' });
       } else {
         setSubmitMsg({ type: 'error', text: '请在微信小程序中打开' });
       }
@@ -384,8 +348,8 @@ export default function BuyPage({ onNavigateHome }) {
       setSubmitMsg({
         type: 'error',
         text: err.message?.includes('ENOENT')
-          ? 'Payment certificate files are missing. Please contact the administrator.'
-          : (err.message || 'Network error. Please try again later.'),
+          ? '支付证书缺失，请联系管理员处理'
+          : (err.message || '网络异常，请稍后重试'),
       });
     } finally {
       setPaying(false);
@@ -449,52 +413,21 @@ export default function BuyPage({ onNavigateHome }) {
   return (
     <div className="buy-page">
       <section className="buy-hero">
-        <img alt="" aria-hidden="true" className="buy-hero__decor buy-hero__decor--left" src={heroDecor.left} />
-        <img alt="" aria-hidden="true" className="buy-hero__decor buy-hero__decor--right" src={heroDecor.right} />
+        <img alt="KACE 2026 购票页顶部视觉" className="buy-hero__image" src={buyHeroImage} />
 
-        <button aria-label="Back" className="buy-hero__back" onClick={handleBack} type="button">
+        <button aria-label="返回" className="buy-hero__back" onClick={handleBack} type="button">
           <IconBack />
         </button>
-
-        <p className="buy-hero__brand">Kalodata</p>
-
-        <div className="buy-hero__content">
-          <div className="buy-hero__title-row">
-            <h1 className="buy-hero__title">
-              KACE
-              <br />
-              2026
-            </h1>
-            <div className="buy-hero__title-side">
-              <p>2026 Kalodata AI</p>
-              <p>Cross-border</p>
-              <p>E-commerce &amp; Influencer</p>
-              <p>Expo</p>
-            </div>
-          </div>
-
-          <p className="buy-hero__headline">
-            AI-powered cross-border commerce
-            <br />
-            and creator collaboration expo
-          </p>
-
-          <div className="buy-hero__scroll">
-            <IconDoubleChevron />
-          </div>
-
-          <p className="buy-hero__meta">2026-08-04 to 2026-08-05 | Shenzhen Futian International Convention Center</p>
-        </div>
       </section>
 
       <main className="buy-main">
         <section className="buy-section">
           <div className="buy-section__heading">
-            <h2>Registration</h2>
-            <p>Fields marked with * are required</p>
+            <h2>报名信息</h2>
+            <p>带有 * 号为必填项</p>
           </div>
 
-          <Field label="Your Role" required>
+          <Field label="您的身份" required>
             <div className="buy-input buy-input--select">
               <span className="buy-input__icon">
                 <IconIdentity />
@@ -512,75 +445,72 @@ export default function BuyPage({ onNavigateHome }) {
             </div>
           </Field>
 
-          <Field label="Company / Brand" required>
+          <Field label="公司/品牌名称" required>
             <div className="buy-input">
               <span className="buy-input__icon">
                 <IconCompany />
               </span>
               <input
-                placeholder="Enter company or brand name"
+                placeholder="请输入公司或品牌名称"
                 value={formData.company}
                 onChange={updateField('company')}
               />
             </div>
           </Field>
 
-          <Field label="Real Name" required>
+          <Field label="您的姓名" required>
             <div className="buy-input">
               <span className="buy-input__icon">
                 <IconName />
               </span>
-              <input placeholder="Enter your real name" value={formData.name} onChange={updateField('name')} />
+              <input placeholder="请输入真实姓名" value={formData.name} onChange={updateField('name')} />
             </div>
           </Field>
 
-          <Field label="ID Card Number" required>
+          <Field label="身份证" required>
             <div className="buy-input">
               <span className="buy-input__icon">
                 <IconIdCard />
               </span>
               <input
                 inputMode="numeric"
-                placeholder="Enter your ID card number"
+                placeholder="请输入身份证号"
                 value={formData.idNumber}
                 onChange={handleIdNumberChange}
               />
             </div>
           </Field>
 
-          <Field label="Mobile Number" required>
+          <Field label="手机号" required>
             <div className="buy-phone buy-phone--locked">
-              <div className="buy-phone__prefix">+86</div>
+              <div className="buy-phone__prefix">
+                <span>+86</span>
+                <span className="buy-phone__prefix-arrow">
+                  <IconChevron />
+                </span>
+              </div>
               <input
                 inputMode="numeric"
                 maxLength={11}
-                placeholder="Complete phone authorization in the mini program"
+                placeholder="请先在小程序完成手机号授权"
                 value={formData.phone}
                 readOnly
               />
             </div>
-            <p className="buy-phone__hint">The phone number is provided by the mini program identity and cannot be edited here.</p>
+            <p className="buy-phone__hint">手机号由小程序授权提供，当前页面不可修改。</p>
           </Field>
 
           <section className="buy-section buy-section--tickets">
-            <h3>Tickets</h3>
+            <h3>入场门票</h3>
 
             <div className="buy-ticket-grid" onScroll={handleTicketScroll} ref={ticketGridRef}>
               {visibleTickets.map((ticket) => {
                 const isActive = ticket.id === selectedTicket;
-                const isDisabled = ticket.purchasable === false;
 
                 return (
                   <button
-                    className={
-                      isDisabled
-                        ? 'buy-ticket buy-ticket--disabled'
-                        : isActive
-                          ? 'buy-ticket buy-ticket--active'
-                          : 'buy-ticket'
-                    }
+                    className={isActive ? 'buy-ticket buy-ticket--active' : 'buy-ticket'}
                     data-ticket-id={ticket.id}
-                    disabled={isDisabled}
                     key={ticket.id}
                     onClick={() => handleSelectTicket(ticket.id)}
                     type="button"
@@ -590,16 +520,14 @@ export default function BuyPage({ onNavigateHome }) {
                         <h4>{ticket.title}</h4>
                         <p>{ticket.note}</p>
                       </div>
-                      {isDisabled ? (
-                        <span className="buy-ticket__status">Unavailable</span>
-                      ) : ticket.originalPrice ? (
-                        <span className="buy-ticket__original">Original {ticket.originalPrice}</span>
-                      ) : null}
                     </div>
 
-                    <div className="buy-ticket__price">
-                      <span className="buy-ticket__currency">&yen;</span>
-                      <span>{ticket.price}</span>
+                    <div className="buy-ticket__price-row">
+                      <div className="buy-ticket__price">
+                        <span className="buy-ticket__currency">&yen;</span>
+                        <span>{ticket.price}</span>
+                      </div>
+                      {ticket.originalPrice ? <span className="buy-ticket__original">原价 {ticket.originalPrice}</span> : null}
                     </div>
 
                     <div className="buy-ticket__features">
@@ -637,7 +565,7 @@ export default function BuyPage({ onNavigateHome }) {
           {submitMsg ? <div className={`buy-msg buy-msg--${submitMsg.type}`}>{submitMsg.text}</div> : null}
 
           <button className="buy-submit" onClick={handleSubmit} disabled={paying} type="button">
-            {paying ? 'Processing...' : '确定'}
+            {paying ? '提交中...' : '确定'}
           </button>
         </section>
       </main>
