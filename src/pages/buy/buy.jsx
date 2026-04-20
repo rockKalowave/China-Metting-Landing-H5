@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getApiUrl } from '../../utils/api';
-import { getStoredMiniAppUser, resolveMiniAppUser } from '../../utils/miniAppUser';
+import { getStoredMiniAppUser, resolveMiniAppUser, verifyRealName } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './buy.css';
 
 const publicAsset = (relativePath) => encodeURI(`${import.meta.env.BASE_URL}${relativePath}`);
 const buyHeroImage = publicAsset('landing/票种设计.png');
+
 const identityOptions = ['设计师', '品牌方', '跨境卖家', '服务商', '达人 / MCN'];
 
 const signupTickets = [
@@ -15,7 +16,7 @@ const signupTickets = [
     title: '早鸟双日票',
     originalPrice: 599,
     price: 0,
-    note: '7.31日23.59分停止售卖',
+    note: '7月31日 23:59 截止',
     features: [
       { text: '双日畅行全展区与完整议程', included: true },
       { text: '解锁全体验区与品牌展位', included: true },
@@ -167,6 +168,13 @@ function Field({ children, label, required = false }) {
   );
 }
 
+function maskIdNumber(value) {
+  if (!value || value.length < 8) {
+    return value || '';
+  }
+  return `${value.slice(0, 4)}********${value.slice(-4)}`;
+}
+
 export default function BuyPage({ onNavigateHome }) {
   const visibleTickets = useMemo(() => signupTickets, []);
   const ticketGridRef = useRef(null);
@@ -181,6 +189,8 @@ export default function BuyPage({ onNavigateHome }) {
   });
   const [submitMsg, setSubmitMsg] = useState(null);
   const [paying, setPaying] = useState(false);
+  const [identityVerifying, setIdentityVerifying] = useState(false);
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
 
   const selectedTicketInfo = useMemo(
     () => visibleTickets.find((ticket) => ticket.id === selectedTicket) ?? visibleTickets[0],
@@ -221,6 +231,50 @@ export default function BuyPage({ onNavigateHome }) {
     setSubmitMsg(null);
   };
 
+  const buildOrderData = () => {
+    const { company, idNumber, identity, name, phone } = formData;
+
+    if (!identity || !company || !name || !idNumber || !phone) {
+      setSubmitMsg({ type: 'error', text: '请填写所有必填项' });
+      return null;
+    }
+
+    if (!/^[1-9]\d{16}[\dX]$/.test(idNumber)) {
+      setSubmitMsg({ type: 'error', text: '请输入正确的18位身份证号' });
+      return null;
+    }
+
+    if (!/^1\d{10}$/.test(phone)) {
+      setSubmitMsg({ type: 'error', text: '仅支持中国大陆 +86 手机号' });
+      return null;
+    }
+
+    if (!miniAppUser?.phone) {
+      setSubmitMsg({ type: 'error', text: '请先在小程序内完成手机号授权' });
+      return null;
+    }
+
+    if (miniAppUser.phone !== phone) {
+      setSubmitMsg({ type: 'error', text: '手机号需与小程序授权信息一致' });
+      return null;
+    }
+
+    return {
+      areaCode: '+86',
+      company,
+      idNumber,
+      name,
+      originalPrice: selectedTicketInfo.originalPrice ?? 0,
+      phone: miniAppUser.phone,
+      position: identity,
+      price: selectedTicketInfo.price ?? 0,
+      productCode: selectedTicketInfo.productCode,
+      ticketTitle: selectedTicketInfo.title,
+      wechatOpenId: miniAppUser.wechatOpenId || '',
+      wechatUnionId: miniAppUser.wechatUnionId || '',
+    };
+  };
+
   const saveUser = async (orderData, status) => {
     const response = await fetch(getApiUrl('/users'), {
       method: 'POST',
@@ -246,49 +300,7 @@ export default function BuyPage({ onNavigateHome }) {
     return result.data;
   };
 
-  const handleSubmit = async () => {
-    const { company, idNumber, identity, name, phone } = formData;
-
-    if (!identity || !company || !name || !idNumber || !phone) {
-      setSubmitMsg({ type: 'error', text: '请填写所有必填项' });
-      return;
-    }
-
-    if (!/^[1-9]\d{16}[\dX]$/.test(idNumber)) {
-      setSubmitMsg({ type: 'error', text: '请输入正确的18位身份证号' });
-      return;
-    }
-
-    if (!/^1\d{10}$/.test(phone)) {
-      setSubmitMsg({ type: 'error', text: '仅支持中国大陆 +86 手机号' });
-      return;
-    }
-
-    if (!miniAppUser?.phone) {
-      setSubmitMsg({ type: 'error', text: '请先在小程序内完成手机号授权' });
-      return;
-    }
-
-    if (miniAppUser.phone !== phone) {
-      setSubmitMsg({ type: 'error', text: '手机号需与小程序授权信息一致' });
-      return;
-    }
-
-    const orderData = {
-      areaCode: '+86',
-      company,
-      idNumber,
-      name,
-      originalPrice: selectedTicketInfo.originalPrice ?? 0,
-      phone: miniAppUser.phone,
-      position: identity,
-      price: selectedTicketInfo.price ?? 0,
-      productCode: selectedTicketInfo.productCode,
-      ticketTitle: selectedTicketInfo.title,
-      wechatOpenId: miniAppUser.wechatOpenId || '',
-      wechatUnionId: miniAppUser.wechatUnionId || '',
-    };
-
+  const submitOrder = async (orderData) => {
     setPaying(true);
     setSubmitMsg(null);
 
@@ -339,7 +351,7 @@ export default function BuyPage({ onNavigateHome }) {
           url: `/pages/pay/pay?order=${encodeURIComponent(JSON.stringify(orderParams))}&language=zh-CN`,
         });
       } else if (inMiniProgram) {
-        setSubmitMsg({ type: 'error', text: '微信 JSSDK 未加载，请刷新或退出后重进小程序' });
+        setSubmitMsg({ type: 'error', text: '微信 JSSDK 未加载，请刷新后重试' });
       } else {
         setSubmitMsg({ type: 'error', text: '请在微信小程序中打开' });
       }
@@ -353,6 +365,53 @@ export default function BuyPage({ onNavigateHome }) {
       });
     } finally {
       setPaying(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    const orderData = buildOrderData();
+    if (!orderData) {
+      return;
+    }
+    setSubmitMsg(null);
+    setVerifyDialogOpen(true);
+  };
+
+  const handleConfirmRealName = async () => {
+    const orderData = buildOrderData();
+    if (!orderData) {
+      setVerifyDialogOpen(false);
+      return;
+    }
+
+    setIdentityVerifying(true);
+    setSubmitMsg(null);
+
+    try {
+      const verifyResult = await verifyRealName({
+        name: orderData.name,
+        idNumber: orderData.idNumber,
+        phone: orderData.phone,
+        ticketType: orderData.ticketTitle,
+      });
+
+      if (!verifyResult?.verified) {
+        setSubmitMsg({
+          type: 'error',
+          text: verifyResult?.message || '实名认证未通过，请核对姓名与身份证号',
+        });
+        return;
+      }
+
+      setVerifyDialogOpen(false);
+      await submitOrder(orderData);
+    } catch (error) {
+      setSubmitMsg({
+        type: 'error',
+        text: error.message || '实名认证服务暂不可用，请稍后重试',
+      });
+    } finally {
+      setIdentityVerifying(false);
     }
   };
 
@@ -564,11 +623,63 @@ export default function BuyPage({ onNavigateHome }) {
 
           {submitMsg ? <div className={`buy-msg buy-msg--${submitMsg.type}`}>{submitMsg.text}</div> : null}
 
-          <button className="buy-submit" onClick={handleSubmit} disabled={paying} type="button">
+          <button className="buy-submit" onClick={handleSubmit} disabled={paying || identityVerifying} type="button">
             {paying ? '提交中...' : '确定'}
           </button>
         </section>
       </main>
+
+      {verifyDialogOpen ? (
+        <div className="buy-dialog" role="presentation">
+          <div className="buy-dialog__backdrop" onClick={() => !identityVerifying && setVerifyDialogOpen(false)} />
+          <div
+            aria-describedby="buy-realname-desc"
+            aria-labelledby="buy-realname-title"
+            aria-modal="true"
+            className="buy-dialog__panel"
+            role="dialog"
+          >
+            <h3 className="buy-dialog__title" id="buy-realname-title">
+              实名认证确认
+            </h3>
+            <p className="buy-dialog__text" id="buy-realname-desc">
+              点击确认后，将使用您填写的姓名和身份证号进行阿里云实名认证。认证通过后才会继续创建订单并发起支付。
+            </p>
+            <div className="buy-dialog__summary">
+              <div>
+                <span>姓名</span>
+                <strong>{formData.name || '--'}</strong>
+              </div>
+              <div>
+                <span>身份证号</span>
+                <strong>{maskIdNumber(formData.idNumber) || '--'}</strong>
+              </div>
+              <div>
+                <span>票种</span>
+                <strong>{selectedTicketInfo.title}</strong>
+              </div>
+            </div>
+            <div className="buy-dialog__actions">
+              <button
+                className="buy-dialog__button buy-dialog__button--ghost"
+                disabled={identityVerifying}
+                onClick={() => setVerifyDialogOpen(false)}
+                type="button"
+              >
+                取消
+              </button>
+              <button
+                className="buy-dialog__button buy-dialog__button--primary"
+                disabled={identityVerifying}
+                onClick={handleConfirmRealName}
+                type="button"
+              >
+                {identityVerifying ? '实名认证中...' : '确认实名'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

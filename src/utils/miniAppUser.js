@@ -293,3 +293,17 @@ export async function fetchTicketWallet(identity) {
   cacheTicketWallet(data);
   return data;
 }
+
+export async function verifyRealName(payload) {
+  const response = await fetch(getApiUrl('/users/real-name/verify'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: payload?.name,
+      id_card_no: payload?.idNumber,
+      phone: payload?.phone,
+      ticket_type: payload?.ticketType,
+    }),
+  });
+  return readApiResponse(response);
+}
