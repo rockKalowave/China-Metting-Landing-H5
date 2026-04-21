@@ -1,0 +1,65 @@
+src/pages/ticket/ticket.css
+  h_b2be70cfc5404d 34
+src/App.jsx
+  ddd45f432481703b 14,65
+src/pages/buy/buy.jsx
+  h_b2be70cfc5404d 607-609
+  80972f81713c7207 270-274
+  0a4151fb07e100eb 404,412,420,427,432-440,442,444-445,448
+src/pages/buy/buy.css
+  0a4151fb07e100eb 229,233,240-244,249-255,257,259-268
+  h_b2be70cfc5404d 221,247-248,256
+src/utils/miniAppBridge.js
+  ddd45f432481703b 12-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "32d96e86d877c5fe0db0e118504061c435db426b",
+  "prompts": {
+    "0a4151fb07e100eb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3ca7385b-15e0-424d-9624-acfcfd9152bc",
+        "model": "gpt-5.4-medium"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 49,
+      "total_deletions": 363,
+      "accepted_lines": 43,
+      "overriden_lines": 3
+    },
+    "80972f81713c7207": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d03785f5-fd85-40b4-9385-5c5c99e80bd0",
+        "model": "<synthetic>"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 1,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "ddd45f432481703b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4de0956d-4026-4b7f-adb7-35436c213f0e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 2,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
