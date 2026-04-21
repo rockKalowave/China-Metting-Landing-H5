@@ -532,7 +532,11 @@ export default function BuyPage({ onNavigateHome }) {
                 <IconIdCard />
               </span>
               <input
-                inputMode="numeric"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                inputMode="text"
+                spellCheck={false}
+                type="text"
                 placeholder="请输入身份证号"
                 value={formData.idNumber}
                 onChange={handleIdNumberChange}
