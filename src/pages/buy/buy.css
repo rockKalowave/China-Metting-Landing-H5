@@ -218,6 +218,7 @@
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding-top: 4px;
 }
 
 .buy-ticket-grid::-webkit-scrollbar {
@@ -225,21 +226,46 @@
 }
 
 .buy-ticket {
+  position: relative;
   flex: 0 0 calc((100% - 12px) / 2);
   min-height: 340px;
   padding: 18px 14px 18px;
-  border: 0;
+  border: 2px solid transparent;
   border-radius: 18px;
   background: #ffffff;
   text-align: left;
   scroll-snap-align: start;
   box-shadow: 0 10px 24px rgba(45, 102, 246, 0.05);
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
+/* .buy-ticket::before { */
+  /* content: '';
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  height: 5px;
+  border-radius: 999px;
+  background: transparent;
+} */
+
 .buy-ticket--active {
-  box-shadow: 0 14px 30px rgba(45, 102, 246, 0.12);
-  outline: 2px solid rgba(47, 103, 245, 0.18);
+  border-color: #2f67f5;
+  background: linear-gradient(180deg, #f7faff 0%, #ffffff 24%);
+  box-shadow:
+    0 18px 36px rgba(45, 102, 246, 0.2),
+    0 0 0 4px rgba(47, 103, 245, 0.12);
+  transform: translateY(-3px);
+}
+
+.buy-ticket--active::before {
+  background: linear-gradient(90deg, #2f67f5 0%, #74a2ff 100%);
 }
 
 .buy-ticket__header h4 {
@@ -358,104 +384,6 @@
   cursor: default;
 }
 
-.buy-dialog {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-}
-
-.buy-dialog__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(16, 33, 77, 0.44);
-  backdrop-filter: blur(3px);
-}
-
-.buy-dialog__panel {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(calc(100vw - 32px), 380px);
-  transform: translate(-50%, -50%);
-  padding: 22px 18px 18px;
-  border-radius: 22px;
-  background: #ffffff;
-  box-shadow: 0 22px 56px rgba(21, 56, 140, 0.26);
-}
-
-.buy-dialog__title {
-  margin: 0;
-  color: #244fcf;
-  font-size: 1.16rem;
-  font-weight: 800;
-}
-
-.buy-dialog__text {
-  margin: 12px 0 0;
-  color: #4f5f89;
-  font-size: 0.92rem;
-  line-height: 1.6;
-}
-
-.buy-dialog__summary {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  background: #f3f7ff;
-}
-
-.buy-dialog__summary div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.buy-dialog__summary span {
-  color: #5d6f9f;
-  font-size: 0.88rem;
-}
-
-.buy-dialog__summary strong {
-  color: #1e2b4d;
-  font-size: 0.92rem;
-  font-weight: 800;
-}
-
-.buy-dialog__actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.buy-dialog__button {
-  min-height: 48px;
-  border-radius: 14px;
-  font-size: 0.95rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.buy-dialog__button:disabled {
-  opacity: 0.72;
-  cursor: default;
-}
-
-.buy-dialog__button--ghost {
-  border: 1.8px solid rgba(47, 103, 245, 0.26);
-  background: #ffffff;
-  color: #2f67f5;
-}
-
-.buy-dialog__button--primary {
-  border: 0;
-  background: linear-gradient(180deg, #336cf7 0%, #2d66f6 100%);
-  color: #ffffff;
-}
-
 @media (max-width: 360px) {
   .buy-main {
     padding-inline: 12px;
@@ -474,9 +402,5 @@
 
   .buy-ticket__feature {
     font-size: 0.78rem;
-  }
-
-  .buy-dialog__panel {
-    padding-inline: 16px;
   }
 }

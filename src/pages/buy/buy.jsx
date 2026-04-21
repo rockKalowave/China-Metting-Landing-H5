@@ -2,12 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getApiUrl } from '../../utils/api';
 import {
   cachePendingRealNameVerification,
-  clearRealNameReturnPayload,
-  fetchRealNameVerificationResult,
   getPendingRealNameVerification,
   getStoredMiniAppUser,
   initRealNameVerification,
-  parseRealNameReturnPayload,
   resolveMiniAppUser,
 } from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
@@ -177,13 +174,6 @@ function Field({ children, label, required = false }) {
   );
 }
 
-function maskIdNumber(value) {
-  if (!value || value.length < 8) {
-    return value || '';
-  }
-  return `${value.slice(0, 4)}********${value.slice(-4)}`;
-}
-
 function getTicketIdByOrder(orderData) {
   return signupTickets.find(
     (ticket) => ticket.productCode === orderData?.productCode || ticket.title === orderData?.ticketTitle,
@@ -223,14 +213,12 @@ export default function BuyPage({ onNavigateHome }) {
   const initialPendingVerification = getPendingRealNameVerification();
   const visibleTickets = useMemo(() => signupTickets, []);
   const ticketGridRef = useRef(null);
-  const realNameReturnHandledRef = useRef(false);
   const [miniAppUser, setMiniAppUser] = useState(initialMiniAppUser);
   const [selectedTicket, setSelectedTicket] = useState(getTicketIdByOrder(initialPendingVerification?.orderData));
   const [formData, setFormData] = useState(() => buildInitialFormData(initialMiniAppUser, initialPendingVerification));
   const [submitMsg, setSubmitMsg] = useState(null);
   const [paying, setPaying] = useState(false);
   const [identityVerifying, setIdentityVerifying] = useState(false);
-  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
 
   const selectedTicketInfo = useMemo(
     () => visibleTickets.find((ticket) => ticket.id === selectedTicket) ?? visibleTickets[0],
@@ -276,6 +264,11 @@ export default function BuyPage({ onNavigateHome }) {
 
     if (!identity || !company || !name || !idNumber || !phone) {
       setSubmitMsg({ type: 'error', text: '请填写所有必填项' });
+      return null;
+    }
+
+    if (!/^[\u4e00-\u9fa5\u00b7]{2,}$/.test(name)) {
+      setSubmitMsg({ type: 'error', text: '姓名仅支持中文字符，请输入身份证上的真实姓名' });
       return null;
     }
 
@@ -408,93 +401,7 @@ export default function BuyPage({ onNavigateHome }) {
     }
   };
 
-  useEffect(() => {
-    if (realNameReturnHandledRef.current) {
-      return;
-    }
-
-    const returnPayload = parseRealNameReturnPayload();
-    if (!returnPayload) {
-      return;
-    }
-
-    realNameReturnHandledRef.current = true;
-    clearRealNameReturnPayload();
-
-    const pendingVerification = getPendingRealNameVerification();
-    const certifyId = returnPayload.certifyId || pendingVerification?.certifyId || '';
-    const requestNo = pendingVerification?.requestNo || '';
-    const orderData = pendingVerification?.orderData || null;
-
-    if (orderData) {
-      setSelectedTicket(getTicketIdByOrder(orderData));
-      setFormData((prev) => ({
-        ...prev,
-        identity: orderData.position || prev.identity,
-        company: orderData.company || prev.company,
-        name: orderData.name || prev.name,
-        idNumber: orderData.idNumber || prev.idNumber,
-        phone: orderData.phone || prev.phone,
-      }));
-    }
-
-    if (!requestNo || !certifyId || !orderData) {
-      setSubmitMsg({ type: 'error', text: '未找到待处理的实名认证会话，请重新发起认证' });
-      return;
-    }
-
-    let cancelled = false;
-
-    const finalizeVerification = async () => {
-      setIdentityVerifying(true);
-      setSubmitMsg(null);
-
-      try {
-        const verifyResult = await fetchRealNameVerificationResult({
-          requestNo,
-          certifyId,
-        });
-
-        if (!verifyResult?.verified) {
-          setSubmitMsg({
-            type: 'error',
-            text: verifyResult?.message || '实名认证未通过，请重新发起认证',
-          });
-          return;
-        }
-
-        cachePendingRealNameVerification({
-          ...pendingVerification,
-          certifyId,
-          verified: true,
-          verifiedAt: Date.now(),
-        });
-
-        if (!cancelled) {
-          await submitOrder(orderData);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setSubmitMsg({
-            type: 'error',
-            text: error.message || '实名认证结果查询失败，请稍后重试',
-          });
-        }
-      } finally {
-        if (!cancelled) {
-          setIdentityVerifying(false);
-        }
-      }
-    };
-
-    finalizeVerification();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const orderData = buildOrderData();
     if (!orderData) {
       return;
@@ -502,18 +409,7 @@ export default function BuyPage({ onNavigateHome }) {
 
     const pendingVerification = getPendingRealNameVerification();
     if (isReusableVerifiedOrder(pendingVerification, orderData)) {
-      submitOrder(orderData);
-      return;
-    }
-
-    setSubmitMsg(null);
-    setVerifyDialogOpen(true);
-  };
-
-  const handleConfirmRealName = async () => {
-    const orderData = buildOrderData();
-    if (!orderData) {
-      setVerifyDialogOpen(false);
+      await submitOrder(orderData);
       return;
     }
 
@@ -521,33 +417,35 @@ export default function BuyPage({ onNavigateHome }) {
     setSubmitMsg(null);
 
     try {
-      if (typeof window.getMetaInfo !== 'function') {
-        throw new Error('实名认证环境初始化失败，请在支持的浏览器或小程序容器中重试');
-      }
-
-      const initResult = await initRealNameVerification({
+      const verifyResult = await initRealNameVerification({
         name: orderData.name,
         idNumber: orderData.idNumber,
         phone: orderData.phone,
         ticketType: orderData.ticketTitle,
-        metaInfo: window.getMetaInfo(),
-        returnUrl: `${window.location.origin}${toExternalPath('/buy')}`,
       });
 
-      if (!initResult?.certify_url || !initResult?.request_no || !initResult?.certify_id) {
+      if (!verifyResult?.request_no) {
         setSubmitMsg({ type: 'error', text: '实名认证初始化失败，请稍后重试' });
         return;
       }
 
+      if (!verifyResult?.verified) {
+        cachePendingRealNameVerification(null);
+        setSubmitMsg({
+          type: 'error',
+          text: verifyResult?.message || '姓名与身份证号校验未通过，请检查后重试',
+        });
+        return;
+      }
+
       cachePendingRealNameVerification({
-        requestNo: initResult.request_no,
-        certifyId: initResult.certify_id,
+        requestNo: verifyResult.request_no,
         orderData,
-        verified: false,
+        verified: true,
+        verifiedAt: Date.now(),
       });
 
-      setVerifyDialogOpen(false);
-      window.location.href = initResult.certify_url;
+      await submitOrder(orderData);
     } catch (error) {
       setSubmitMsg({
         type: 'error',
@@ -706,7 +604,9 @@ export default function BuyPage({ onNavigateHome }) {
             <p className="buy-phone__hint">手机号由小程序授权提供，当前页面不可修改。</p>
           </Field>
 
-          <section className="buy-section buy-section--tickets">
+          <section className="buy-section buy-section--tickets" style={{
+            marginTop: '14px',
+          }}>
             <h3>入场门票</h3>
 
             <div className="buy-ticket-grid" onScroll={handleTicketScroll} ref={ticketGridRef}>
@@ -775,58 +675,6 @@ export default function BuyPage({ onNavigateHome }) {
           </button>
         </section>
       </main>
-
-      {verifyDialogOpen ? (
-        <div className="buy-dialog" role="presentation">
-          <div className="buy-dialog__backdrop" onClick={() => !identityVerifying && setVerifyDialogOpen(false)} />
-          <div
-            aria-describedby="buy-realname-desc"
-            aria-labelledby="buy-realname-title"
-            aria-modal="true"
-            className="buy-dialog__panel"
-            role="dialog"
-          >
-            <h3 className="buy-dialog__title" id="buy-realname-title">
-              实名认证确认
-            </h3>
-            <p className="buy-dialog__text" id="buy-realname-desc">
-              点击确认后，将使用您填写的姓名和身份证号发起阿里云实人认证。认证通过后才会继续创建订单并发起支付。
-            </p>
-            <div className="buy-dialog__summary">
-              <div>
-                <span>姓名</span>
-                <strong>{formData.name || '--'}</strong>
-              </div>
-              <div>
-                <span>身份证号</span>
-                <strong>{maskIdNumber(formData.idNumber) || '--'}</strong>
-              </div>
-              <div>
-                <span>票种</span>
-                <strong>{selectedTicketInfo.title}</strong>
-              </div>
-            </div>
-            <div className="buy-dialog__actions">
-              <button
-                className="buy-dialog__button buy-dialog__button--ghost"
-                disabled={identityVerifying}
-                onClick={() => setVerifyDialogOpen(false)}
-                type="button"
-              >
-                取消
-              </button>
-              <button
-                className="buy-dialog__button buy-dialog__button--primary"
-                disabled={identityVerifying}
-                onClick={handleConfirmRealName}
-                type="button"
-              >
-                {identityVerifying ? '实名认证中...' : '确认实名'}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

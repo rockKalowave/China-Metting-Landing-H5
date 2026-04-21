@@ -11,7 +11,7 @@ import {
 import BuyPage from './pages/buy/buy';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
-import { navigateBackToMiniProgram } from './utils/miniAppBridge';
+import { navigateBackToMiniProgram, openExternalUrl } from './utils/miniAppBridge';
 import { getStoredMiniAppUser, resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
 const SPONSORSHIP_URL = 'https://active.kalodata.com/survey/';
@@ -62,7 +62,7 @@ function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, s
       id: 'sponsorship',
       label: '招商合作',
       onClick: () => {
-        window.location.href = SPONSORSHIP_URL;
+        openExternalUrl(SPONSORSHIP_URL);
       },
     },
     {
