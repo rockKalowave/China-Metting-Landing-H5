@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getApiUrl } from '../../utils/api';
-import { getStoredMiniAppUser, resolveMiniAppUser, verifyRealName } from '../../utils/miniAppUser';
+import {
+  cachePendingRealNameVerification,
+  clearRealNameReturnPayload,
+  fetchRealNameVerificationResult,
+  getPendingRealNameVerification,
+  getStoredMiniAppUser,
+  initRealNameVerification,
+  parseRealNameReturnPayload,
+  resolveMiniAppUser,
+} from '../../utils/miniAppUser';
 import { toExternalPath } from '../../utils/routes';
 import './buy.css';
 
@@ -44,7 +53,7 @@ const signupTickets = [
   {
     id: 'vip',
     productCode: 'TICKET_VIP',
-    title: 'VIP通票',
+    title: 'VIP 通票',
     originalPrice: 1999,
     price: 1299,
     note: '双日通行，含商达撮合区权益',
@@ -52,7 +61,7 @@ const signupTickets = [
       { text: '双日畅行全展区与完整议程', included: true },
       { text: '含“商达撮合区”入场与对接权益', included: true },
       { text: '重点论坛优先席位', included: true },
-      { text: 'VIP礼包与优先服务', included: true },
+      { text: 'VIP 礼包与优先服务', included: true },
       { text: '展商品牌互动，领取专属福利', included: true },
       { text: '高价值商机撮合与资源链接', included: true },
     ],
@@ -175,18 +184,49 @@ function maskIdNumber(value) {
   return `${value.slice(0, 4)}********${value.slice(-4)}`;
 }
 
+function getTicketIdByOrder(orderData) {
+  return signupTickets.find(
+    (ticket) => ticket.productCode === orderData?.productCode || ticket.title === orderData?.ticketTitle,
+  )?.id ?? signupTickets[0].id;
+}
+
+function buildInitialFormData(miniAppUser, pendingVerification) {
+  const pendingOrder = pendingVerification?.orderData;
+  return {
+    identity: pendingOrder?.position || identityOptions[0],
+    company: pendingOrder?.company || '',
+    name: pendingOrder?.name || '',
+    idNumber: pendingOrder?.idNumber || '',
+    phone: miniAppUser?.phone || pendingOrder?.phone || '',
+  };
+}
+
+function isReusableVerifiedOrder(pendingVerification, orderData) {
+  if (!pendingVerification?.verified || !pendingVerification?.orderData || !orderData) {
+    return false;
+  }
+
+  const verifiedAt = Number(pendingVerification.verifiedAt || 0);
+  if (!verifiedAt || Date.now() - verifiedAt > 30 * 60 * 1000) {
+    return false;
+  }
+
+  const pendingOrder = pendingVerification.orderData;
+  return pendingOrder.name === orderData.name
+    && pendingOrder.idNumber === orderData.idNumber
+    && pendingOrder.phone === orderData.phone
+    && pendingOrder.productCode === orderData.productCode;
+}
+
 export default function BuyPage({ onNavigateHome }) {
+  const initialMiniAppUser = getStoredMiniAppUser();
+  const initialPendingVerification = getPendingRealNameVerification();
   const visibleTickets = useMemo(() => signupTickets, []);
   const ticketGridRef = useRef(null);
-  const [miniAppUser, setMiniAppUser] = useState(getStoredMiniAppUser());
-  const [selectedTicket, setSelectedTicket] = useState(visibleTickets[0].id);
-  const [formData, setFormData] = useState({
-    identity: identityOptions[0],
-    company: '',
-    name: '',
-    idNumber: '',
-    phone: getStoredMiniAppUser()?.phone || '',
-  });
+  const realNameReturnHandledRef = useRef(false);
+  const [miniAppUser, setMiniAppUser] = useState(initialMiniAppUser);
+  const [selectedTicket, setSelectedTicket] = useState(getTicketIdByOrder(initialPendingVerification?.orderData));
+  const [formData, setFormData] = useState(() => buildInitialFormData(initialMiniAppUser, initialPendingVerification));
   const [submitMsg, setSubmitMsg] = useState(null);
   const [paying, setPaying] = useState(false);
   const [identityVerifying, setIdentityVerifying] = useState(false);
@@ -368,11 +408,104 @@ export default function BuyPage({ onNavigateHome }) {
     }
   };
 
+  useEffect(() => {
+    if (realNameReturnHandledRef.current) {
+      return;
+    }
+
+    const returnPayload = parseRealNameReturnPayload();
+    if (!returnPayload) {
+      return;
+    }
+
+    realNameReturnHandledRef.current = true;
+    clearRealNameReturnPayload();
+
+    const pendingVerification = getPendingRealNameVerification();
+    const certifyId = returnPayload.certifyId || pendingVerification?.certifyId || '';
+    const requestNo = pendingVerification?.requestNo || '';
+    const orderData = pendingVerification?.orderData || null;
+
+    if (orderData) {
+      setSelectedTicket(getTicketIdByOrder(orderData));
+      setFormData((prev) => ({
+        ...prev,
+        identity: orderData.position || prev.identity,
+        company: orderData.company || prev.company,
+        name: orderData.name || prev.name,
+        idNumber: orderData.idNumber || prev.idNumber,
+        phone: orderData.phone || prev.phone,
+      }));
+    }
+
+    if (!requestNo || !certifyId || !orderData) {
+      setSubmitMsg({ type: 'error', text: '未找到待处理的实名认证会话，请重新发起认证' });
+      return;
+    }
+
+    let cancelled = false;
+
+    const finalizeVerification = async () => {
+      setIdentityVerifying(true);
+      setSubmitMsg(null);
+
+      try {
+        const verifyResult = await fetchRealNameVerificationResult({
+          requestNo,
+          certifyId,
+        });
+
+        if (!verifyResult?.verified) {
+          setSubmitMsg({
+            type: 'error',
+            text: verifyResult?.message || '实名认证未通过，请重新发起认证',
+          });
+          return;
+        }
+
+        cachePendingRealNameVerification({
+          ...pendingVerification,
+          certifyId,
+          verified: true,
+          verifiedAt: Date.now(),
+        });
+
+        if (!cancelled) {
+          await submitOrder(orderData);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSubmitMsg({
+            type: 'error',
+            text: error.message || '实名认证结果查询失败，请稍后重试',
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          setIdentityVerifying(false);
+        }
+      }
+    };
+
+    finalizeVerification();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleSubmit = () => {
     const orderData = buildOrderData();
     if (!orderData) {
       return;
     }
+
+    const pendingVerification = getPendingRealNameVerification();
+    if (isReusableVerifiedOrder(pendingVerification, orderData)) {
+      submitOrder(orderData);
+      return;
+    }
+
     setSubmitMsg(null);
     setVerifyDialogOpen(true);
   };
@@ -388,23 +521,33 @@ export default function BuyPage({ onNavigateHome }) {
     setSubmitMsg(null);
 
     try {
-      const verifyResult = await verifyRealName({
+      if (typeof window.getMetaInfo !== 'function') {
+        throw new Error('实名认证环境初始化失败，请在支持的浏览器或小程序容器中重试');
+      }
+
+      const initResult = await initRealNameVerification({
         name: orderData.name,
         idNumber: orderData.idNumber,
         phone: orderData.phone,
         ticketType: orderData.ticketTitle,
+        metaInfo: window.getMetaInfo(),
+        returnUrl: `${window.location.origin}${toExternalPath('/buy')}`,
       });
 
-      if (!verifyResult?.verified) {
-        setSubmitMsg({
-          type: 'error',
-          text: verifyResult?.message || '实名认证未通过，请核对姓名与身份证号',
-        });
+      if (!initResult?.certify_url || !initResult?.request_no || !initResult?.certify_id) {
+        setSubmitMsg({ type: 'error', text: '实名认证初始化失败，请稍后重试' });
         return;
       }
 
+      cachePendingRealNameVerification({
+        requestNo: initResult.request_no,
+        certifyId: initResult.certify_id,
+        orderData,
+        verified: false,
+      });
+
       setVerifyDialogOpen(false);
-      await submitOrder(orderData);
+      window.location.href = initResult.certify_url;
     } catch (error) {
       setSubmitMsg({
         type: 'error',
@@ -647,7 +790,7 @@ export default function BuyPage({ onNavigateHome }) {
               实名认证确认
             </h3>
             <p className="buy-dialog__text" id="buy-realname-desc">
-              点击确认后，将使用您填写的姓名和身份证号进行阿里云实名认证。认证通过后才会继续创建订单并发起支付。
+              点击确认后，将使用您填写的姓名和身份证号发起阿里云实人认证。认证通过后才会继续创建订单并发起支付。
             </p>
             <div className="buy-dialog__summary">
               <div>

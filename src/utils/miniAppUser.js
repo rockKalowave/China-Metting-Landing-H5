@@ -2,6 +2,7 @@ import { getApiUrl } from './api';
 
 const MINIAPP_USER_STORAGE_KEY = 'kace_miniapp_user';
 const TICKET_WALLET_STORAGE_KEY = 'kace_ticket_wallet';
+const REAL_NAME_PENDING_STORAGE_KEY = 'kace_real_name_pending';
 
 function parseJson(value) {
   if (!value) {
@@ -13,6 +14,32 @@ function parseJson(value) {
   } catch (error) {
     return null;
   }
+}
+
+function parseJsonLike(value) {
+  if (!value) {
+    return null;
+  }
+
+  const candidates = [String(value)];
+  try {
+    const decoded = decodeURIComponent(String(value));
+    if (decoded !== value) {
+      candidates.push(decoded);
+    }
+  } catch (error) {}
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (typeof parsed === 'string') {
+        return JSON.parse(parsed);
+      }
+      return parsed;
+    } catch (error) {}
+  }
+
+  return null;
 }
 
 function normalizePhone(rawPhone) {
@@ -150,6 +177,14 @@ async function isRunningInMiniProgram() {
   });
 }
 
+async function readApiResponse(response) {
+  const result = await response.json();
+  if (!response.ok || result.code !== 0) {
+    throw new Error(result.message || '请求失败');
+  }
+  return result.data;
+}
+
 export function getStoredMiniAppUser() {
   const userFromUrl = readMiniAppUserFromUrl();
   if (userFromUrl) {
@@ -208,6 +243,72 @@ export function cacheTicketWallet(ticketWallet) {
   sessionStorage.setItem(TICKET_WALLET_STORAGE_KEY, JSON.stringify(ticketWallet));
 }
 
+export function getPendingRealNameVerification() {
+  return parseJson(sessionStorage.getItem(REAL_NAME_PENDING_STORAGE_KEY));
+}
+
+export function cachePendingRealNameVerification(payload) {
+  if (!payload) {
+    sessionStorage.removeItem(REAL_NAME_PENDING_STORAGE_KEY);
+    return;
+  }
+
+  sessionStorage.setItem(REAL_NAME_PENDING_STORAGE_KEY, JSON.stringify(payload));
+}
+
+export function clearPendingRealNameVerification() {
+  sessionStorage.removeItem(REAL_NAME_PENDING_STORAGE_KEY);
+}
+
+export function parseRealNameReturnPayload() {
+  const url = new URL(window.location.href);
+  const response = parseJsonLike(url.searchParams.get('response'));
+  const directCertifyId = url.searchParams.get('certifyId') || url.searchParams.get('certify_id');
+  const directCode = url.searchParams.get('code');
+  const directSubCode = url.searchParams.get('subCode') || url.searchParams.get('sub_code') || url.searchParams.get('passed');
+
+  if (response) {
+    const extInfo = response.extInfo ?? {};
+    return {
+      ...response,
+      certifyId: extInfo.certifyId || response.certifyId || directCertifyId || '',
+      code: response.code || directCode || '',
+      subCode: response.subCode || directSubCode || '',
+    };
+  }
+
+  if (!directCertifyId && !directCode && !directSubCode) {
+    return null;
+  }
+
+  return {
+    certifyId: directCertifyId || '',
+    code: directCode || '',
+    subCode: directSubCode || '',
+  };
+}
+
+export function clearRealNameReturnPayload() {
+  const url = new URL(window.location.href);
+  const keys = ['response', 'certifyId', 'certify_id', 'code', 'subCode', 'sub_code', 'passed', 'callbackToken'];
+
+  let changed = false;
+  keys.forEach((key) => {
+    if (url.searchParams.has(key)) {
+      url.searchParams.delete(key);
+      changed = true;
+    }
+  });
+
+  if (!changed) {
+    return;
+  }
+
+  const query = url.searchParams.toString();
+  const nextUrl = `${url.pathname}${query ? `?${query}` : ''}${url.hash}`;
+  window.history.replaceState({}, '', nextUrl);
+}
+
 export function getOrderLookupIdentity() {
   const order = parseJson(sessionStorage.getItem('kace_order'));
   return normalizeMiniAppUser({
@@ -242,14 +343,6 @@ export async function resolveMiniAppUser() {
 
 export async function resolveTicketLookupIdentity() {
   return (await resolveMiniAppUser()) ?? getOrderLookupIdentity();
-}
-
-async function readApiResponse(response) {
-  const result = await response.json();
-  if (!response.ok || result.code !== 0) {
-    throw new Error(result.message || '请求失败');
-  }
-  return result.data;
 }
 
 export async function syncMiniAppEntry(identity) {
@@ -294,8 +387,8 @@ export async function fetchTicketWallet(identity) {
   return data;
 }
 
-export async function verifyRealName(payload) {
-  const response = await fetch(getApiUrl('/users/real-name/verify'), {
+export async function initRealNameVerification(payload) {
+  const response = await fetch(getApiUrl('/users/real-name/verify/init'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -303,6 +396,20 @@ export async function verifyRealName(payload) {
       id_card_no: payload?.idNumber,
       phone: payload?.phone,
       ticket_type: payload?.ticketType,
+      meta_info: payload?.metaInfo,
+      return_url: payload?.returnUrl,
+    }),
+  });
+  return readApiResponse(response);
+}
+
+export async function fetchRealNameVerificationResult(payload) {
+  const response = await fetch(getApiUrl('/users/real-name/verify/result'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      request_no: payload?.requestNo,
+      certify_id: payload?.certifyId,
     }),
   });
   return readApiResponse(response);
