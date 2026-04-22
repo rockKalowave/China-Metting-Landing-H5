@@ -1,0 +1,30 @@
+src/landingMobileData.js
+  15c4e98a0816ffd5 28,30-31,65-67,71-83,85-86
+src/App.jsx
+  h_b2be70cfc5404d 109-111,211,220,222,319-322,326-328
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "7d659e95a048f81de5ae4e25d0c3de7cf2d7118f",
+  "prompts": {
+    "15c4e98a0816ffd5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6f6f3fc7-d92b-4824-9fd2-ac75002f19d9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 21,
+      "total_deletions": 19,
+      "accepted_lines": 21,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
