@@ -9,7 +9,7 @@ import {
   visualSections,
 } from './landingMobileData';
 import BuyPage from './pages/buy/buy';
-import SignupPage from './pages/signup/SignupPage';
+// import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
 import { navigateBackToMiniProgram, navigateToOtherMiniProgram, openExternalUrl } from './utils/miniAppBridge';
 import { getStoredMiniAppUser, resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
@@ -418,7 +418,6 @@ function App() {
   const [activeSection, setActiveSection] = useState('intro');
   const [entryState, setEntryState] = useState(DEFAULT_ENTRY_STATE);
   const navSyncTimerRef = useRef(null);
-  const isSignupPage = currentPath === '/signup';
   const isBuyPage = currentPath === '/buy';
   const isTicketPage = currentPath === '/ticket';
 
@@ -465,29 +464,9 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    document.title = isSignupPage
-      ? 'KACE 2026 报名信息 - Kalodata'
-      : 'KACE 2026 - Kalodata';
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname || '/');
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      if (navSyncTimerRef.current) {
-        window.clearTimeout(navSyncTimerRef.current);
-      }
-    };
-  }, [isSignupPage]);
 
   useEffect(() => {
-    if (isSignupPage || isBuyPage || isTicketPage) {
+    if (isBuyPage || isTicketPage) {
       return undefined;
     }
 
@@ -517,7 +496,7 @@ function App() {
       window.removeEventListener('scroll', updateActiveSection);
       window.removeEventListener('resize', updateActiveSection);
     };
-  }, [isSignupPage, isBuyPage, isTicketPage]);
+  }, [ isBuyPage, isTicketPage]);
 
   const navigateTo = (path) => {
     if (window.location.pathname !== path) {
@@ -542,10 +521,6 @@ function App() {
       }, 720);
     }
   };
-
-  if (isSignupPage) {
-    return <SignupPage onNavigateHome={() => navigateTo('/')} />;
-  }
 
   if (isBuyPage) {
     return <BuyPage onNavigateHome={() => navigateTo('/')} />;
