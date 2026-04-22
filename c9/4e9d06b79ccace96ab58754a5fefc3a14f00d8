@@ -1,0 +1,35 @@
+src/landingMobileData.js
+  f2e1366cb89cdfa3 28,30-31,65-67,71-82
+src/App.jsx
+  h_b2be70cfc5404d 180-181
+src/styles.css
+  f2e1366cb89cdfa3 746,749
+  h_b2be70cfc5404d 408
+src/pages/buy/buy.jsx
+  h_b2be70cfc5404d 324,420-425,427-430,432-439,441-446
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "c94e9d06b79ccace96ab58754a5fefc3a14f00d8",
+  "prompts": {
+    "f2e1366cb89cdfa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c82c00b9-6f2b-4723-93fa-155bece46540",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 28,
+      "total_deletions": 64,
+      "accepted_lines": 20,
+      "overriden_lines": 8
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
