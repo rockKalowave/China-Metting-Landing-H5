@@ -1,0 +1,35 @@
+src/pages/partner/partner.css
+  473ddf346c30c1e6 1-260
+src/utils/api.js
+  h_b2be70cfc5404d 5
+src/pages/partner/PartnerPage.jsx
+  h_b2be70cfc5404d 232
+  473ddf346c30c1e6 1-231,233-241
+src/App.jsx
+  473ddf346c30c1e6 14,16,66,440,488,518,548-551
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "c9a49a89f9daf2be79e87c04ad8c4278fd16b788",
+  "prompts": {
+    "473ddf346c30c1e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "decc67f6-17c9-46dd-b36f-d5e40d05a317",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "佳伟",
+      "messages": [],
+      "total_additions": 535,
+      "total_deletions": 6,
+      "accepted_lines": 510,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_b2be70cfc5404d": {
+      "author": "佳伟"
+    }
+  }
+}
