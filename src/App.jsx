@@ -177,8 +177,8 @@ function CroppedImageSection({
       <div
         className="landing-cropped-section__viewport"
         style={{
-          '--crop-aspect-ratio': `750 / ${cropHeight}`,
-          '--crop-translate': `${-(cropStart / sourceHeight) * 100}%`,
+          // '--crop-aspect-ratio': `750 / ${cropHeight}`,
+          // '--crop-translate': `${-(cropStart / sourceHeight) * 100}%`,
         }}
       >
         <img alt={alt} className="landing-cropped-section__image" loading="lazy" src={image} />

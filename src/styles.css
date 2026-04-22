@@ -405,6 +405,7 @@ a {
 .landing-visual-section__image {
   width: 100%;
   height: auto;
+  padding-top: 40px;
 }
 
 .landing-visual-section__marker {
@@ -742,25 +743,10 @@ a {
   overflow: hidden;
 }
 
-.creator-values-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: min(100%, 296px);
-  margin: 0 auto;
-  align-items: start;
-  gap: 12px;
-}
-
-.creator-values-card {
-  background: transparent;
-  justify-self: center;
-  width: 100%;
-  max-width: 142px;
-}
-
-.creator-values-card img {
+.creator-values-slide__image {
   width: 100%;
   height: auto;
+  display: block;
 }
 
 .creator-values-slider__pagination {

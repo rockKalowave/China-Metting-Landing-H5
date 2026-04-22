@@ -321,7 +321,7 @@ export default function BuyPage({ onNavigateHome }) {
         wechat_union_id: orderData.wechatUnionId,
         id_card_no: orderData.idNumber,
         email: '',
-        ticket_type: orderData.ticketTitle || '',
+        ticket_type: orderData.productCode || '',
         status,
       }),
     });
@@ -417,33 +417,33 @@ export default function BuyPage({ onNavigateHome }) {
     setSubmitMsg(null);
 
     try {
-      const verifyResult = await initRealNameVerification({
-        name: orderData.name,
-        idNumber: orderData.idNumber,
-        phone: orderData.phone,
-        ticketType: orderData.ticketTitle,
-      });
+      // const verifyResult = await initRealNameVerification({
+      //   name: orderData.name,
+      //   idNumber: orderData.idNumber,
+      //   phone: orderData.phone,
+      //   ticketType: orderData.ticketTitle,
+      // });
 
-      if (!verifyResult?.request_no) {
-        setSubmitMsg({ type: 'error', text: '实名认证初始化失败，请稍后重试' });
-        return;
-      }
+      // if (!verifyResult?.request_no) {
+      //   setSubmitMsg({ type: 'error', text: '实名认证初始化失败，请稍后重试' });
+      //   return;
+      // }
 
-      if (!verifyResult?.verified) {
-        cachePendingRealNameVerification(null);
-        setSubmitMsg({
-          type: 'error',
-          text: verifyResult?.message || '姓名与身份证号校验未通过，请检查后重试',
-        });
-        return;
-      }
+      // if (!verifyResult?.verified) {
+      //   cachePendingRealNameVerification(null);
+      //   setSubmitMsg({
+      //     type: 'error',
+      //     text: verifyResult?.message || '姓名与身份证号校验未通过，请检查后重试',
+      //   });
+      //   return;
+      // }
 
-      cachePendingRealNameVerification({
-        requestNo: verifyResult.request_no,
-        orderData,
-        verified: true,
-        verifiedAt: Date.now(),
-      });
+      // cachePendingRealNameVerification({
+      //   requestNo: verifyResult.request_no,
+      //   orderData,
+      //   verified: true,
+      //   verifiedAt: Date.now(),
+      // });
 
       await submitOrder(orderData);
     } catch (error) {
