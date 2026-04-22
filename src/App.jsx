@@ -7,6 +7,7 @@ import {
   valueCreatorPages,
   visualCuts,
   visualSections,
+  audienceBackground,
 } from './landingMobileData';
 import BuyPage from './pages/buy/buy';
 // import SignupPage from './pages/signup/SignupPage';
@@ -105,7 +106,9 @@ function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, s
         >
           <span>{action.label}</span>
           <span aria-hidden="true" className="floating-actions__arrow">
-            {`>`}
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3.64966 2L8.64966 6L3.64966 10" stroke="#2366F9" strokeWidth="2"/>
+          </svg>
           </span>
         </button>
       ))}
@@ -189,21 +192,35 @@ function CroppedImageSection({
 
 function IndustrySection() {
   return (
-    <section className="industry-section" id="industry">
+    <section className="industry-section relative h-[500px]" id="industry" style={{
+      height: '500px',
+      position: 'relative',
+    }}>
       <CroppedImageSection
         alt="行业首创"
         className="industry-section__crop"
         cropHeight={2880}
         cropStart={0}
         id=""
-        image={visualSections.industry}
+        image={audienceBackground}
         sourceHeight={3100}
       />
 
-      <div className="industry-section__marquees">
+      <div className="industry-section__marquees" style={{
+        position: 'absolute',
+        bottom: '30px',
+      }}>
         <Marquee itemClassName="marquee__item--logo" items={logoItems} />
         <Marquee direction="right" itemClassName="marquee__item--creator" items={creatorTrackItems} />
       </div>
+      <div style={{
+        position: 'relative',
+        zIndex: 99,
+        textAlign: 'center',
+        fontSize: '12px',
+        color: '#999',
+        marginTop: '-10px',
+      }}>*以上品牌与达人均列入拟邀约名单</div>
     </section>
   );
 }
@@ -232,7 +249,9 @@ function CreatorValuesShowcase() {
   };
 
   return (
-    <section className="creator-values-showcase" id="creators">
+    <section className="creator-values-showcase" style={{
+      height: '840px',
+    }} id="creators">
       <img
         alt="拟邀请达人背景"
         className="creator-values-showcase__background"
@@ -297,12 +316,17 @@ function HomePage({ activeSection, entryLabel, entryPath, navigateTo, scrollToSe
         <button
           aria-label="返回小程序主页"
           className="mobile-header__back"
+          style={{
+            height:'25px',
+            width:'25px'
+          }}
           onClick={() => navigateBackToMiniProgram()}
           type="button"
         >
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+          <path d="M7.41528 22H37.266" stroke="#2366F9" stroke-width="3.73134" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22.5 6L6.50226 21.9977L22.5 37.9955" stroke="#2366F9" stroke-width="3.73" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         </button>
         <button
           className="mobile-header__brand"

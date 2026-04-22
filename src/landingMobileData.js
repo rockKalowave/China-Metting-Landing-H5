@@ -25,10 +25,10 @@ export const heroDecor = {
 };
 
 export const visualCuts = {
-  content: publicAsset('newlanding/展会内容.jpg'),
+  content: publicAsset('newlanding/展会内容.webp'),
   featureCards: publicAsset('landing-mobile/cuts/Frame 2147206582@2x.png'),
-  highlights: publicAsset('newlanding/展会亮点.jpg'),
-  heroReference: publicAsset('newlanding/首屏底图.jpg'),
+  highlights: publicAsset('newlanding/展会亮点.webp'),
+  heroReference: publicAsset('newlanding/首屏底图.webp'),
 };
 
 export const logoItems = [
@@ -62,22 +62,25 @@ export const creatorTrackItems = [
 ];
 
 export const valueCreatorPages = [
-  [{ id: 'invited-creator-page-1', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第一页.png'), alt: '拟邀请达人第一页' }],
-  [{ id: 'invited-creator-page-2', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第二页.png'), alt: '拟邀请达人第二页' }],
-  [{ id: 'invited-creator-page-3', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第三页.png'), alt: '拟邀请达人第三页' }],
+  [{ id: 'invited-creator-page-1', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第一页.webp'), alt: '拟邀请达人第一页' }],
+  [{ id: 'invited-creator-page-2', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第二页.webp'), alt: '拟邀请达人第二页' }],
+  [{ id: 'invited-creator-page-3', image: publicAsset('newlanding/拟邀请达人/小程序端 达人第三页.webp'), alt: '拟邀请达人第三页' }],
 ];
 
 export const visualSections = {
-  intro: publicAsset('newlanding/大会介绍.jpg'),
-  industry: publicAsset('newlanding/行业首创.jpg'),
-  values: publicAsset('newlanding/核心价值.jpg'),
-  invitedCreatorsBackground: publicAsset('newlanding/拟邀请达人/拟邀请达人.jpg'),
-  brandBackground: publicAsset('newlanding/品牌机构底图.jpg'),
-  brandAndCreators: publicAsset('newlanding/品牌 & 机构与达人.jpg'),
-  review: publicAsset('newlanding/往期回顾.jpg'),
-  organizer: publicAsset('newlanding/主办方介绍.jpg'),
-  expoDesignMain: publicAsset('newlanding/大会设计.jpg'),
-  expoDesignSecondary: publicAsset('newlanding/大会设计2.jpg'),
-  audience: publicAsset('newlanding/用户画像.jpg'),
-  contact: publicAsset('newlanding/联系我们.jpg'),
+  intro: publicAsset('newlanding/大会介绍.webp'),
+  industry: publicAsset('newlanding/行业首创.webp'),
+  values: publicAsset('newlanding/核心价值.webp'),
+  invitedCreatorsBackground: publicAsset('newlanding/拟邀请达人/拟邀请达人.webp'),
+  brandBackground: publicAsset('newlanding/品牌机构底图.webp'),
+  brandAndCreators: publicAsset('newlanding/品牌 & 机构与达人.webp'),
+  review: publicAsset('newlanding/往期回顾.webp'),
+  organizer: publicAsset('newlanding/主办方介绍.webp'),
+  expoDesignMain: publicAsset('newlanding/大会设计.webp'),
+  expoDesignSecondary: publicAsset('newlanding/大会设计2.webp'),
+  audience: publicAsset('newlanding/用户画像.webp'),
+  contact: publicAsset('newlanding/联系我们.webp'),
+  audienceBackground: publicAsset('newlanding/品牌 & 机构与达人.webp'),
 };
+
+export const audienceBackground = visualSections.audienceBackground;
