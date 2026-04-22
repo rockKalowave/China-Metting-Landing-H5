@@ -11,11 +11,11 @@ import {
 } from './landingMobileData';
 import BuyPage from './pages/buy/buy';
 // import SignupPage from './pages/signup/SignupPage';
+import PartnerPage from './pages/partner/PartnerPage';
 import TicketPage from './pages/ticket/TicketPage';
-import { navigateBackToMiniProgram, navigateToOtherMiniProgram, openExternalUrl } from './utils/miniAppBridge';
+import { navigateBackToMiniProgram } from './utils/miniAppBridge';
 import { getStoredMiniAppUser, resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
-const SPONSORSHIP_URL = 'https://active.kalodata.com/survey/';
 const DEFAULT_ENTRY_STATE = {
   has_purchased: false,
   entry_label: '立即报名',
@@ -63,13 +63,7 @@ function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, s
       id: 'sponsorship',
       label: '招商合作',
       onClick: () => {
-        // 问卷星小程序 AppID，路径中 activityId 为问卷短ID
-        const WJX_APP_ID = 'wxd947200f82267e58';
-        const WJX_PATH = 'pages/wjxqList/wjxqList?activityId=tU5XHKW';
-        if (!navigateToOtherMiniProgram(WJX_APP_ID, WJX_PATH)) {
-          // 非小程序环境回退到网页版
-          openExternalUrl(SPONSORSHIP_URL);
-        }
+          navigateTo('/partner');
       },
     },
     {
@@ -443,6 +437,7 @@ function App() {
   const [entryState, setEntryState] = useState(DEFAULT_ENTRY_STATE);
   const navSyncTimerRef = useRef(null);
   const isBuyPage = currentPath === '/buy';
+  const isPartnerPage = currentPath === '/partner';
   const isTicketPage = currentPath === '/ticket';
 
   useEffect(() => {
@@ -490,7 +485,7 @@ function App() {
 
 
   useEffect(() => {
-    if (isBuyPage || isTicketPage) {
+    if (isBuyPage || isPartnerPage || isTicketPage) {
       return undefined;
     }
 
@@ -520,7 +515,7 @@ function App() {
       window.removeEventListener('scroll', updateActiveSection);
       window.removeEventListener('resize', updateActiveSection);
     };
-  }, [ isBuyPage, isTicketPage]);
+  }, [ isBuyPage, isPartnerPage, isTicketPage]);
 
   const navigateTo = (path) => {
     if (window.location.pathname !== path) {
@@ -548,6 +543,10 @@ function App() {
 
   if (isBuyPage) {
     return <BuyPage onNavigateHome={() => navigateTo('/')} />;
+  }
+
+  if (isPartnerPage) {
+    return <PartnerPage onNavigateHome={() => navigateTo('/')} />;
   }
 
   if (isTicketPage) {
