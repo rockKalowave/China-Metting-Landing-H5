@@ -31,6 +31,26 @@ export function openExternalUrl(url) {
   }
 }
 
+export function navigateToOtherMiniProgram(appId, path = '') {
+  if (!isInMiniProgram()) {
+    return false;
+  }
+  const mp = window.wx?.miniProgram;
+  if (!mp?.navigateTo) {
+    return false;
+  }
+  try {
+    const query = `appId=${encodeURIComponent(appId)}${path ? `&path=${encodeURIComponent(path)}` : ''}`;
+    mp.navigateTo({
+      url: `/pages/navigate/navigate?${query}`,
+    });
+    return true;
+  } catch (error) {
+    console.warn('navigateToOtherMiniProgram failed', error);
+    return false;
+  }
+}
+
 export function navigateBackToMiniProgram(options = {}) {
   if (!isInMiniProgram()) {
     return false;

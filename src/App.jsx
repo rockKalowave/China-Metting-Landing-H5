@@ -11,7 +11,7 @@ import {
 import BuyPage from './pages/buy/buy';
 import SignupPage from './pages/signup/SignupPage';
 import TicketPage from './pages/ticket/TicketPage';
-import { navigateBackToMiniProgram, openExternalUrl } from './utils/miniAppBridge';
+import { navigateBackToMiniProgram, navigateToOtherMiniProgram, openExternalUrl } from './utils/miniAppBridge';
 import { getStoredMiniAppUser, resolveMiniAppUser, syncMiniAppEntry } from './utils/miniAppUser';
 
 const SPONSORSHIP_URL = 'https://active.kalodata.com/survey/';
@@ -62,7 +62,13 @@ function FloatingActions({ entryLabel, entryPath, navigateTo, scrollToSection, s
       id: 'sponsorship',
       label: '招商合作',
       onClick: () => {
-        openExternalUrl(SPONSORSHIP_URL);
+        // 问卷星小程序 AppID，路径中 activityId 为问卷短ID
+        const WJX_APP_ID = 'wxd947200f82267e58';
+        const WJX_PATH = 'pages/wjxqList/wjxqList?activityId=tU5XHKW';
+        if (!navigateToOtherMiniProgram(WJX_APP_ID, WJX_PATH)) {
+          // 非小程序环境回退到网页版
+          openExternalUrl(SPONSORSHIP_URL);
+        }
       },
     },
     {
