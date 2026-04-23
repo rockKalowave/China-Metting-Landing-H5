@@ -77,6 +77,11 @@
   object-fit: contain;
 }
 
+svg.ticket-wallet-card__qr {
+  width: 100%;
+  height: 100%;
+}
+
 .ticket-wallet-card__qr-empty {
   display: flex;
   align-items: center;

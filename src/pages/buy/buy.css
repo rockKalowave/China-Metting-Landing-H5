@@ -136,11 +136,16 @@
 
 .buy-input__arrow {
   width: 40px;
+  pointer-events: none;
 }
 
 .buy-input select,
 .buy-input input {
   padding-right: 6px;
+}
+
+.buy-input--select {
+  cursor: pointer;
 }
 
 .buy-input select {
@@ -219,6 +224,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-top: 4px;
+  /* height: 100%; */
 }
 
 .buy-ticket-grid::-webkit-scrollbar {
@@ -226,9 +232,10 @@
 }
 
 .buy-ticket {
+
   position: relative;
   flex: 0 0 calc((100% - 12px) / 2);
-  min-height: 340px;
+  /* min-height: 340px; */
   padding: 18px 14px 18px;
   border: 2px solid transparent;
   border-radius: 18px;
@@ -242,6 +249,11 @@
     box-shadow 0.2s ease,
     border-color 0.2s ease,
     background 0.2s ease;
+  /* height: 100%; */
+
+  align-items: flex-start;
+    display: flex;
+    flex-direction: column;
 }
 
 /* .buy-ticket::before { */
@@ -266,6 +278,29 @@
 
 .buy-ticket--active::before {
   background: linear-gradient(90deg, #2f67f5 0%, #74a2ff 100%);
+}
+
+.buy-ticket--disabled {
+  cursor: not-allowed;
+  opacity: 0.78;
+  background: #f5f7fb;
+  box-shadow: none;
+}
+
+.buy-ticket--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.buy-ticket__approval-note {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff7e6;
+  color: #c77600;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .buy-ticket__header h4 {
@@ -321,6 +356,8 @@
   display: grid;
   gap: 8px;
   margin-top: 12px;
+  /* white-space: nowrap; */
+  min-width: 200px;
 }
 
 .buy-ticket__feature {

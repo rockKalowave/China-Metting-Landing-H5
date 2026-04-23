@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   fetchTicketWallet,
   getStoredTicketWallet,
@@ -98,7 +99,7 @@ function PolicyModal({ visible, onClose }) {
 }
 
 const publicAsset = (relativePath) => encodeURI(`${import.meta.env.BASE_URL}${relativePath}`);
-const ticketWalletBackground = publicAsset('landing/小程序购票页/票夹底图.png');
+const ticketWalletBackground = publicAsset('landing/小程序购票页/票夹底图.webp');
 const ticketWalletHomeButton = publicAsset('landing/小程序购票页/按钮 - 票夹 - 返回首页.svg');
 
 function TicketStatus({ actionLabel = '返回首页', message, onAction }) {
@@ -181,8 +182,8 @@ export default function TicketPage({ onNavigateHome, ticketWallet: initialTicket
     return getTicketTitleByProductCode(ticket_type)
   }, [ticketWallet]);
 
-  const ticketQrUrl = useMemo(
-    () => ticketWallet?.qr_code_url || ticketWallet?.qrCodeUrl || ticketWallet?.qr_code || '',
+  const ticketQrCode = useMemo(
+    () => ticketWallet?.qr_code || '',
     [ticketWallet],
   );
 
@@ -209,8 +210,14 @@ export default function TicketPage({ onNavigateHome, ticketWallet: initialTicket
             </div>
 
             <div className="ticket-wallet-card__qr-slot">
-              {ticketQrUrl ? (
-                <img alt="KACE 2026 入场二维码" className="ticket-wallet-card__qr" src={ticketQrUrl} />
+              {ticketQrCode ? (
+                <QRCodeSVG
+                  aria-label="KACE 2026 入场二维码"
+                  className="ticket-wallet-card__qr"
+                  value={ticketQrCode}
+                  level="M"
+                  marginSize={2}
+                />
               ) : (
                 <div className="ticket-wallet-card__qr-empty">二维码生成中</div>
               )}

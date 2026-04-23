@@ -294,17 +294,13 @@ export async function syncMiniAppEntry(identity) {
 
 export async function fetchTicketWallet(identity) {
   const normalized = normalizeMiniAppUser(identity);
-  if (!normalized) {
+  if (!normalized?.phone || !normalized?.wechatOpenId) {
     return null;
   }
 
   const params = new URLSearchParams();
-  if (normalized.phone) {
-    params.set('phone', normalized.phone);
-  }
-  if (normalized.wechatOpenId) {
-    params.set('wechat_open_id', normalized.wechatOpenId);
-  }
+  params.set('phone', normalized.phone);
+  params.set('wechat_open_id', normalized.wechatOpenId);
 
   const response = await fetch(`${getApiUrl('/users/ticket-wallet')}?${params.toString()}`);
   const data = await readApiResponse(response);

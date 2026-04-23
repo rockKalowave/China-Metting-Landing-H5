@@ -11,7 +11,7 @@ import { toExternalPath } from '../../utils/routes';
 import './buy.css';
 
 const publicAsset = (relativePath) => encodeURI(`${import.meta.env.BASE_URL}${relativePath}`);
-const buyHeroImage = publicAsset('landing/票种设计.png');
+const buyHeroImage = publicAsset('landing/票种设计.webp');
 
 const identityOptions = ['设计师', '品牌方', '跨境卖家', '服务商', '达人 / MCN'];
 
@@ -126,16 +126,27 @@ function Field({ children, label, required = false }) {
   );
 }
 
+function getSelectableTickets() {
+  return signupTickets.filter((ticket) => !ticket.hidden);
+}
+
 function getTicketIdByOrder(orderData) {
-  return signupTickets.find(
-    (ticket) => ticket.productCode === orderData?.productCode || ticket.title === orderData?.ticketTitle,
-  )?.id ?? signupTickets[0].id;
+  const selectable = getSelectableTickets();
+  const matched = selectable.find(
+    (ticket) => !ticket.inviteOnly
+      && (ticket.productCode === orderData?.productCode || ticket.title === orderData?.ticketTitle),
+  );
+  if (matched) {
+    return matched.id;
+  }
+  const firstSelectable = selectable.find((ticket) => !ticket.inviteOnly);
+  return firstSelectable?.id ?? selectable[0]?.id;
 }
 
 function buildInitialFormData(miniAppUser, pendingVerification) {
   const pendingOrder = pendingVerification?.orderData;
   return {
-    identity: pendingOrder?.position || identityOptions[0],
+    identity: pendingOrder?.position || '',
     company: pendingOrder?.company || '',
     name: pendingOrder?.name || '',
     idNumber: pendingOrder?.idNumber || '',
@@ -163,7 +174,7 @@ function isReusableVerifiedOrder(pendingVerification, orderData) {
 export default function BuyPage({ onNavigateHome }) {
   const initialMiniAppUser = getStoredMiniAppUser();
   const initialPendingVerification = getPendingRealNameVerification();
-  const visibleTickets = useMemo(() => signupTickets, []);
+  const visibleTickets = useMemo(() => getSelectableTickets(), []);
   const ticketGridRef = useRef(null);
   const [miniAppUser, setMiniAppUser] = useState(initialMiniAppUser);
   const [selectedTicket, setSelectedTicket] = useState(getTicketIdByOrder(initialPendingVerification?.orderData));
@@ -172,10 +183,15 @@ export default function BuyPage({ onNavigateHome }) {
   const [paying, setPaying] = useState(false);
   const [identityVerifying, setIdentityVerifying] = useState(false);
 
-  const selectedTicketInfo = useMemo(
-    () => visibleTickets.find((ticket) => ticket.id === selectedTicket) ?? visibleTickets[0],
-    [selectedTicket, visibleTickets],
-  );
+  const selectedTicketInfo = useMemo(() => {
+    const matched = visibleTickets.find(
+      (ticket) => ticket.id === selectedTicket && !ticket.inviteOnly,
+    );
+    if (matched) {
+      return matched;
+    }
+    return visibleTickets.find((ticket) => !ticket.inviteOnly) ?? visibleTickets[0];
+  }, [selectedTicket, visibleTickets]);
 
   useEffect(() => {
     let cancelled = false;
@@ -236,6 +252,11 @@ export default function BuyPage({ onNavigateHome }) {
 
     if (!miniAppUser?.phone) {
       setSubmitMsg({ type: 'error', text: '请先在小程序内完成手机号授权' });
+      return null;
+    }
+
+    if (!miniAppUser?.wechatOpenId) {
+      setSubmitMsg({ type: 'error', text: '缺少微信身份信息，请从小程序重新进入' });
       return null;
     }
 
@@ -435,6 +456,9 @@ export default function BuyPage({ onNavigateHome }) {
     let nearestDistance = Number.POSITIVE_INFINITY;
 
     cards.forEach((card) => {
+      if (card.getAttribute('data-ticket-disabled') === 'true') {
+        return;
+      }
       const cardCenter = card.offsetLeft + card.offsetWidth / 2;
       const distance = Math.abs(cardCenter - containerCenter);
 
@@ -449,11 +473,14 @@ export default function BuyPage({ onNavigateHome }) {
     }
   };
 
-  const handleSelectTicket = (ticketId) => {
-    setSelectedTicket(ticketId);
+  const handleSelectTicket = (ticket) => {
+    if (ticket.inviteOnly) {
+      return;
+    }
+    setSelectedTicket(ticket.id);
 
     const container = ticketGridRef.current;
-    const target = container?.querySelector(`[data-ticket-id="${ticketId}"]`);
+    const target = container?.querySelector(`[data-ticket-id="${ticket.id}"]`);
 
     target?.scrollIntoView({
       behavior: 'smooth',
@@ -480,11 +507,21 @@ export default function BuyPage({ onNavigateHome }) {
           </div>
 
           <Field label="您的身份" required>
-            <div className="buy-input buy-input--select">
+            <div
+              className="buy-input buy-input--select"
+              onClick={(e) => {
+                if (e.target.tagName !== 'SELECT') {
+                  const sel = e.currentTarget.querySelector('select');
+                  if (sel?.showPicker) sel.showPicker();
+                  else sel?.focus();
+                }
+              }}
+            >
               <span className="buy-input__icon">
                 <IconIdentity />
               </span>
               <select value={formData.identity} onChange={updateField('identity')}>
+                <option value="" disabled>请选择您的身份</option>
                 {identityOptions.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -563,20 +600,25 @@ export default function BuyPage({ onNavigateHome }) {
 
             <div className="buy-ticket-grid" onScroll={handleTicketScroll} ref={ticketGridRef}>
               {visibleTickets.map((ticket) => {
-                const isActive = ticket.id === selectedTicket;
+                const isActive = !ticket.inviteOnly && ticket.id === selectedTicket;
+                const classNames = ['buy-ticket'];
+                if (isActive) classNames.push('buy-ticket--active');
+                if (ticket.inviteOnly) classNames.push('buy-ticket--disabled');
 
                 return (
                   <button
-                    className={isActive ? 'buy-ticket buy-ticket--active' : 'buy-ticket'}
+                    aria-disabled={ticket.inviteOnly ? 'true' : undefined}
+                    className={classNames.join(' ')}
                     data-ticket-id={ticket.id}
+                    data-ticket-disabled={ticket.inviteOnly ? 'true' : 'false'}
                     key={ticket.id}
-                    onClick={() => handleSelectTicket(ticket.id)}
+                    onClick={() => handleSelectTicket(ticket)}
                     type="button"
                   >
                     <div className="buy-ticket__header">
                       <div>
                         <h4>{ticket.title}</h4>
-                        <p>{ticket.note}</p>
+                        {ticket.note && !ticket.inviteOnly ? <p>{ticket.note}</p> : null}
                       </div>
                     </div>
 
@@ -601,22 +643,28 @@ export default function BuyPage({ onNavigateHome }) {
                         </div>
                       ))}
                     </div>
+
+                    {ticket.inviteOnly && ticket.note ? (
+                      <p className="buy-ticket__approval-note">{ticket.note}</p>
+                    ) : null}
                   </button>
                 );
               })}
             </div>
 
             <div className="buy-progress-dots buy-progress-dots--tickets" aria-hidden="true">
-              {visibleTickets.map((ticket) => (
-                <span
-                  className={
-                    ticket.id === selectedTicket
-                      ? 'buy-progress-dots__dot buy-progress-dots__dot--active'
-                      : 'buy-progress-dots__dot'
-                  }
-                  key={ticket.id}
-                />
-              ))}
+              {visibleTickets
+                .filter((ticket) => !ticket.inviteOnly)
+                .map((ticket) => (
+                  <span
+                    className={
+                      ticket.id === selectedTicket
+                        ? 'buy-progress-dots__dot buy-progress-dots__dot--active'
+                        : 'buy-progress-dots__dot'
+                    }
+                    key={ticket.id}
+                  />
+                ))}
             </div>
           </section>
 

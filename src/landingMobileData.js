@@ -12,16 +12,16 @@ export const navItems = [
 ];
 
 export const heroGallery = [
-  publicAsset('landing/01首屏/首屏轮播图/1.png'),
-  publicAsset('landing/01首屏/首屏轮播图/2.png'),
-  publicAsset('landing/01首屏/首屏轮播图/3.png'),
-  publicAsset('landing/01首屏/首屏轮播图/4.png'),
-  publicAsset('landing/01首屏/首屏轮播图/5.png'),
+  publicAsset('landing/01首屏/首屏轮播图/1.webp'),
+  publicAsset('landing/01首屏/首屏轮播图/2.webp'),
+  publicAsset('landing/01首屏/首屏轮播图/3.webp'),
+  publicAsset('landing/01首屏/首屏轮播图/4.webp'),
+  publicAsset('landing/01首屏/首屏轮播图/5.webp'),
 ];
 
 export const heroDecor = {
-  left: publicAsset('landing/01首屏/视觉元素 左.png'),
-  right: publicAsset('landing/01首屏/视觉元素 右.png'),
+  left: publicAsset('landing/01首屏/视觉元素 左.webp'),
+  right: publicAsset('landing/01首屏/视觉元素 右.webp'),
 };
 
 export const visualCuts = {
@@ -32,33 +32,33 @@ export const visualCuts = {
 };
 
 export const logoItems = [
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 12.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 13.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 14.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 15.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 16.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 17.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 18.png'),
-  publicAsset('landing/行业首创/logo - 向左轮播/Group 19.png'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 12.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 13.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 14.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 15.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 16.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 17.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 18.webp'),
+  publicAsset('landing/行业首创/logo - 向左轮播/Group 19.webp'),
 ];
 
 export const creatorTrackItems = [
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 12.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 13.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 14.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 15.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 18.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 19.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 20.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 21.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 22.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 23.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 24.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 25.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 26.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 27.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 28.png'),
-  publicAsset('landing/行业首创/达人 - 向右轮播/Group 29.png'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 12.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 13.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 14.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 15.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 18.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 19.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 20.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 21.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 22.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 23.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 24.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 25.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 26.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 27.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 28.webp'),
+  publicAsset('landing/行业首创/达人 - 向右轮播/Group 29.webp'),
 ];
 
 export const valueCreatorPages = [
