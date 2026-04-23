@@ -527,12 +527,21 @@ function App() {
   };
 
   const scrollToSection = (sectionId) => {
+    if (navSyncTimerRef.current) {
+      window.clearTimeout(navSyncTimerRef.current);
+    }
+
+    if (sectionId === 'contact') {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      setActiveSection(sectionId);
+      navSyncTimerRef.current = window.setTimeout(() => {
+        setActiveSection(sectionId);
+      }, 720);
+      return;
+    }
+
     const target = document.getElementById(sectionId);
     if (target) {
-      if (navSyncTimerRef.current) {
-        window.clearTimeout(navSyncTimerRef.current);
-      }
-
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setActiveSection(sectionId);
       navSyncTimerRef.current = window.setTimeout(() => {
